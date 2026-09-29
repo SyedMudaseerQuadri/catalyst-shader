@@ -1,0 +1,78 @@
+# Catalyst — English UI strings. Only the 3 visual + 5 performance preset names are ever shown as presets.
+
+# ---- Performance presets (Iris profile button)
+profile.PERFORMANCE=Performance
+profile.PERFORMANCE.comment=Lowest cost. Minimum target: RTX 3050 (8GB) at 1080p.
+profile.BALANCED=Balanced
+profile.BALANCED.comment=Recommended for most systems.
+profile.QUALITY=Quality
+profile.QUALITY.comment=Softer, wider shadows at higher cost.
+profile.ULTRA=Ultra
+profile.ULTRA.comment=High-end quality.
+profile.CINEMATIC=Cinematic
+profile.CINEMATIC.comment=Maximum validated quality. For screenshots and powerful GPUs.
+
+# ---- Visual preset
+option.VISUAL_PRESET=Visual Style
+option.VISUAL_PRESET.comment=Artistic direction. Independent of the performance preset. Sliders below adjust on top of it.
+value.VISUAL_PRESET.0=Vanilla Enhanced
+value.VISUAL_PRESET.1=Natural / Realistic
+value.VISUAL_PRESET.2=Cinematic
+
+# ---- Screens
+screen.LIGHTING=Lighting
+screen.SHADOWS_SCREEN=Shadows
+screen.ATMOSPHERE=Atmosphere
+screen.COLOR=Color & Exposure
+screen.DEBUG=Debug
+
+# ---- Lighting
+option.SUN_INTENSITY=Sunlight
+option.SUN_INTENSITY.comment=Strength of direct sun and moon light, relative to the visual style.
+option.AMBIENT_INTENSITY=Sky Ambient
+option.AMBIENT_INTENSITY.comment=Strength of light from the sky in shade.
+option.BLOCKLIGHT_INTENSITY=Block Light
+option.BLOCKLIGHT_INTENSITY.comment=Strength of torches, lanterns and other light sources.
+option.EMISSIVE_INTENSITY=Emissive Glow
+option.EMISSIVE_INTENSITY.comment=How strongly light-emitting blocks glow.
+option.NIGHT_VISIBILITY=Night Brightness
+option.NIGHT_VISIBILITY.comment=Moonlight and night-sky brightness. Never goes below a readable minimum.
+
+# ---- Shadows
+option.SHADOWS=Shadows
+option.SHADOWS.comment=Sun and moon shadows. Turning this off gives a large performance gain.
+option.shadowMapResolution=Shadow Resolution
+option.shadowMapResolution.comment=Sharper shadows at higher values. Uses more VRAM.
+option.shadowDistance=Shadow Distance
+option.shadowDistance.comment=How far shadows reach, in blocks.
+option.SHADOW_FILTER=Shadow Filtering
+option.SHADOW_FILTER.comment=Smoothness of shadow edges.
+value.SHADOW_FILTER.0=Hard
+value.SHADOW_FILTER.1=Soft (4 samples)
+value.SHADOW_FILTER.2=Softer (8 samples)
+value.SHADOW_FILTER.3=Smoothest (16 samples)
+option.SHADOW_SOFTNESS=Shadow Softness
+option.SHADOW_SOFTNESS.comment=Width of the soft shadow edge.
+option.sunPathRotation=Sun Path Angle
+option.sunPathRotation.comment=Tilts the sun's path so shadows are never perfectly axis-aligned.
+
+# ---- Atmosphere
+option.FOG_DENSITY=Fog Density
+option.FOG_DENSITY.comment=Distance haze, relative to the visual style. Rain always adds more.
+
+# ---- Color
+option.EXPOSURE_BIAS=Exposure
+option.EXPOSURE_BIAS.comment=Overall brightness in stops.
+option.SATURATION=Saturation
+option.CONTRAST=Contrast
+
+# ---- Debug
+option.DEBUG_VIEW=Debug View
+option.DEBUG_VIEW.comment=Development views of internal data. Keep Off for normal play.
+value.DEBUG_VIEW.0=Off
+value.DEBUG_VIEW.1=Albedo
+value.DEBUG_VIEW.2=Normals
+value.DEBUG_VIEW.3=Light Levels
+value.DEBUG_VIEW.4=Materials
+value.DEBUG_VIEW.5=Depth
+value.DEBUG_VIEW.6=Sun Shadow

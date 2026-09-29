@@ -1,0 +1,13 @@
+# Normalize text to LF in the repository (Iris and shader tooling expect consistent line endings).
+* text=auto eol=lf
+
+*.glsl text eol=lf
+*.vsh  text eol=lf
+*.fsh  text eol=lf
+*.properties text eol=lf
+*.lang text eol=lf
+*.md   text eol=lf
+*.py   text eol=lf
+
+*.png  binary
+*.zip  binary

@@ -1,0 +1,15 @@
+# Third-party reference shader packs: research library only, under their own licenses (~213 MB).
+# Never commit or redistribute them (docs/architecture/governance.md 51.16, docs/research/provenance.md).
+/reference_shaders/
+
+# Build output (tools/package_shaderpack.py). Rebuild from source.
+/dist/
+
+# Local tooling / OS / editor noise
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
