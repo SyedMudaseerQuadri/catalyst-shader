@@ -14,7 +14,7 @@ The M1 shaderpack compiles offline (EV-002), but loading, visuals and performanc
 
 ## I-003 — RESOLVED 2026-09-30: project has its own Git repository
 `catalyst_final_v3/` is now its own repository (branch `main`). `reference_shaders/` (third-party) and `dist/`
-(build output) are ignored. No remote is configured yet; pushing to GitHub needs a repository URL from the human.
+(build output) are ignored. Remote: https://github.com/SyedMudaseerQuadri/catalyst-shader (public, `origin`).
 
 ## I-004 — Project license not chosen
 The release zip ships without a LICENSE. The license is a product decision for the human. Also confirm that no

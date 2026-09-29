@@ -18,7 +18,7 @@ Last checked: 2026-09-30 (Claude Code session on the user's Windows 11 machine).
 | Screenshot capture | UNAVAILABLE | Depends on the client |
 | Frame-time measurement | UNAVAILABLE | Depends on the client |
 | GPU/VRAM measurement | UNAVAILABLE | Depends on the client |
-| Git | AVAILABLE | Git 2.45.1; project is its own repository on `main` since 2026-09-30. No remote yet; GitHub CLI (`gh`) not installed |
+| Git | AVAILABLE | Git 2.45.1; project is its own repository on `main` since 2026-09-30; remote `origin` = github.com/SyedMudaseerQuadri/catalyst-shader (public). GitHub CLI (`gh`) not installed |
 
 Mark each **AVAILABLE**, **UNAVAILABLE**, or **PARTIAL**, with how it was determined.
 
