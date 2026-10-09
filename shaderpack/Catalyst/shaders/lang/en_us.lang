@@ -70,6 +70,8 @@ option.FOG_DENSITY.comment=Distance haze, relative to the visual style. Rain alw
 # ---- Color
 option.EXPOSURE_BIAS=Exposure
 option.EXPOSURE_BIAS.comment=Overall brightness in stops.
+option.EXPOSURE_ADAPTATION=Eye Adaptation
+option.EXPOSURE_ADAPTATION.comment=How much brightness adjusts between dark and bright places. Low keeps interiors and caves naturally darker.
 option.SATURATION=Saturation
 option.CONTRAST=Contrast
 

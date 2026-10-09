@@ -16,10 +16,10 @@ Git checkpoints: tag `m1-compile-verified`, then tag `m2-materials-compile-verif
 - Iris feature set: checked in source (EV-001); runtime UNVERIFIED.
 - Shader compilation: PASS under Khronos glslang 16.6.0 (pinned), 2254 compilations across 23 configurations (EV-003).
 - Specular BRDF energy conservation: PASS (EV-003).
-- Shader runtime / visuals / performance: UNVERIFIED (I-002).
+- Shader runtime: loads in-game (EV-004). Debug views PASS. Normal-view look: interior REWORK fixed in 0.2.1, re-test pending. Performance: UNVERIFIED.
 - Cross-vendor GPU validation: not available.
 
-## In-game check list (record as EV-004)
+## In-game check list (EV-004 done for 0.2.0-m2a; record the next run as EV-005)
 1. Pack loads with no errors in `logs/latest.log` (search "Iris" / "shader").
 2. Overworld noon, sunset, night, rain: sky, sun/moon, shadows and fog look plausible; no black or NaN pixels.
 3. Nether and End load (no shadow pass there) with readable lighting.

@@ -63,3 +63,10 @@ the architecture doc names as the preferred baseline. Without material data (f0 
 purely diffuse, so vanilla textures keep their look (Minecraft identity). Specular is GGX + correlated Smith +
 Schlick with a split-sum sky reflection. Single-scattering energy loss at high roughness is accepted for now (EV-003).
 Option `MATERIAL_MAPS` (default on) skips the two texture reads when disabled. It is not tied to a performance profile.
+
+## D-011 — Indirect light keeps surface color; exposure adapts only partially
+From the first in-game test (EV-004): (1) sky ambient is a near-neutral, desaturated tint of the biome sky at
+~4.5:1 sun-to-sky luminance; (2) occlusion uses an albedo-tinted multi-bounce fit (Jimenez 2016,
+`BOUNCE_STRENGTH` 0.55) as the stand-in for GI until M5; (3) exposure adapts partially (`EXPOSURE_ADAPTATION`,
+default 0.5) between a fixed daylight reference and the scene estimate, so interiors, caves and night stay
+naturally darker. Constants are tuned with `tools/tone_sim.py`, which must be kept in sync with the shader formulas.

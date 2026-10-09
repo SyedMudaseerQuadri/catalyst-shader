@@ -23,7 +23,7 @@ ALLOWED_SUFFIXES = {".vsh", ".fsh", ".gsh", ".csh", ".glsl", ".properties", ".la
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--version", default="0.2.0-m2a")
+    ap.add_argument("--version", default="0.2.1")
     ap.add_argument("--out", default=str(ROOT / "dist"))
     args = ap.parse_args()
 

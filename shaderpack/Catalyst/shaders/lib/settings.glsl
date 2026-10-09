@@ -45,6 +45,8 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define SATURATION 1.00 // [0.70 0.80 0.90 1.00 1.10 1.20 1.30]
 #define CONTRAST 1.00 // [0.80 0.90 1.00 1.10 1.20]
 #define EXPOSURE_BIAS 0.0 // [-2.0 -1.5 -1.0 -0.5 0.0 0.5 1.0 1.5 2.0]
+// Eye adaptation: 0 = fixed exposure, 1 = full adaptation (every scene normalized to the same brightness).
+#define EXPOSURE_ADAPTATION 0.50 // [0.00 0.25 0.50 0.75 1.00]
 #define NIGHT_VISIBILITY 1.00 // [0.50 0.75 1.00 1.50 2.00]
 
 // ---------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-Catalyst — Minecraft Java shader pack (development build 0.2.0-m2a)
+Catalyst — Minecraft Java shader pack (development build 0.2.1)
 
 Requirements
   Minecraft 1.21.11, Fabric Loader, Fabric API 0.141.6, Sodium 0.8.7, Iris 1.10.7.

@@ -7,7 +7,8 @@
 //   specular = GGX sun/moon highlight + sky reflection (split-sum approximation), see specular.glsl
 // Approximations (documented per the architecture rules):
 //   * Sky ambient uses vanilla sky light as an occlusion term. It over-lights narrow overhangs
-//     compared to real GI; screen-space GI (M5) will refine it.
+//     compared to real GI; screen-space GI (M5) will refine it. Interreflection inside occluded spaces
+//     is approximated by an albedo-tinted multi-bounce fit (multiBounce), not traced.
 //   * Block light is Minecraft's per-block light level turned into a falloff curve, not a physical light.
 //     No direction, no shadows and no specular highlight; accepted for M1/M2.
 //   * Thin surfaces (foliage/leaves) use wrapped diffuse for transmission. Cheap and stable, not subsurface transport.
@@ -36,6 +37,21 @@ float directSkyAccess(float skyLevel) {
 	return smoothstep(0.05, 0.35, skyLevel);
 }
 
+// Share of the multi-bounce term (0 = plain occlusion, 1 = full fit). Stands in for GI until M5.
+const float BOUNCE_STRENGTH = 0.55;
+
+// Multi-bounce occlusion fit (Jimenez et al. 2016, "Practical Real-Time Strategies for Accurate Indirect
+// Occlusion"): occluded light is partly bounced back by nearby surfaces of similar albedo, so occlusion
+// darkens less and keeps the surface's own color. Without it, enclosed spaces lit only by blue sky light
+// turn grey (the 0.2.0-m2a in-game failure).
+vec3 multiBounce(float visibility, vec3 albedo) {
+	vec3 a =  2.0404 * albedo - 0.3324;
+	vec3 b = -4.7951 * albedo + 0.6417;
+	vec3 c =  2.7552 * albedo + 0.6903;
+	vec3 fit = max(vec3(visibility), ((visibility * a + b) * visibility + c) * visibility);
+	return mix(vec3(visibility), fit, BOUNCE_STRENGTH);
+}
+
 // `viewDir`: unit vector from the eye toward the surface, player space.
 vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir) {
 	vec3 v = -viewDir;
@@ -59,22 +75,25 @@ vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir)
 	// Hemispheric sky: surfaces facing up see more sky than walls; walls see some ground bounce.
 	float upFacing = s.normal.y * 0.5 + 0.5;
 	float skyVisibility = mix(0.45, 1.0, upFacing);
-	vec3 sky = env.skyAmbient * skyVisibility * skyLightFalloff(s.light.y);
-
+	vec3 aoBounce = multiBounce(s.ao, s.albedo);
 #if defined DIM_NETHER || defined DIM_END
 	// No sky light in these dimensions: their ambient is a dimension-wide constant.
-	sky = env.skyAmbient * skyVisibility;
+	vec3 sky = env.skyAmbient * skyVisibility * aoBounce;
+#else
+	// Sky access (vanilla sky light) and vanilla AO together form the occlusion of the sky term.
+	vec3 sky = env.skyAmbient * skyVisibility * multiBounce(skyLightFalloff(s.light.y) * s.ao, s.albedo);
 #endif
 
 	vec3 block = env.blockLightColor * blockLightFalloff(s.light.x);
 
+	// Readability floor: near-neutral (slightly warm) so it never cools or greys out surfaces.
 	float floorLevel = max(PRESET_MIN_AMBIENT * NIGHT_VISIBILITY, READABILITY_MIN_AMBIENT);
-	vec3 readabilityFloor = vec3(floorLevel) * vec3(0.85, 0.92, 1.0);
+	vec3 readabilityFloor = vec3(floorLevel) * vec3(1.0, 0.97, 0.92);
 
-	vec3 indirect = (sky * PRESET_SHADOW_AMBIENT + block + readabilityFloor) * s.ao;
+	vec3 indirect = sky * PRESET_SHADOW_AMBIENT + (block + readabilityFloor) * aoBounce;
 
 	// Night vision (vanilla effect) lifts all indirect light.
-	indirect += nightVision * 0.25 * s.ao;
+	indirect += nightVision * 0.25 * aoBounce;
 
 	vec3 emitted = s.albedo * s.emission * 4.0 * EMISSIVE_INTENSITY;
 
