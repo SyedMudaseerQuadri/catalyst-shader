@@ -26,3 +26,14 @@ No reference-shader source code was used. `reference_shaders/` was not opened fo
 | Normal encoding | Cigolle et al., "A Survey of Efficient Representations for Independent Unit Vectors" (JCGT 2014) | octahedral encoding | `lib/core/encode.glsl` | algorithmic |
 | Tonemap | Reinhard et al. (2002), extended operator with white point | HDR to display compression | `lib/post/tonemap.glsl` | algorithmic |
 | Color transfer | IEC 61966-2-1 (sRGB) | exact sRGB EOTF/OETF | `lib/core/common.glsl` | standard |
+
+## Recorded influences (M2 materials)
+
+| Subsystem | Source | Concept | Catalyst interpretation | Influence type |
+|---|---|---|---|---|
+| Material format | LabPBR Material Standard 1.3 (shaderLABS wiki, public specification) | resource-pack normal/specular channel layout | decoded from the spec text in `lib/material/labpbr.glsl` | standard |
+| Tangent frame | Iris `NormalHelper.computeTangent` (LGPL-3.0, read for the interface contract only) | sign convention of `at_tangent.w` | bitangent = cross(T, N) * w; no code copied | interface contract |
+| Specular distribution | Walter et al., "Microfacet Models for Refraction through Rough Surfaces" (EGSR 2007) | GGX NDF | `ggxDistribution()` | algorithmic |
+| Visibility | Heitz, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs" (JCGT 2014) | height-correlated Smith G2 | `smithGgxCorrelatedVisibility()` | algorithmic |
+| Fresnel | Schlick (1994) | Fresnel approximation | `fresnelSchlick()` | algorithmic |
+| Environment BRDF | Karis, "Physically Based Shading on Mobile" (Unreal Engine blog, 2014) | analytic split-sum fit, F0 < 2% treated as no specular | `environmentBrdf()` | algorithmic (published fit constants) |

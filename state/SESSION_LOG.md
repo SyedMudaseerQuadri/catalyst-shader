@@ -7,3 +7,5 @@ Append only meaningful state-changing work. Do not record routine chat.
 - 2026-09-30 — M1 built: `shaderpack/Catalyst` (shadow, forward-lit gbuffers, analytic sky, fog, exposure/tonemap, debug views, 3 dimensions, 5 profiles + 3 visual presets). Added `tools/validate_shaderpack.py` and `tools/package_shaderpack.py`. Validation PASS: 2058 compilations (EV-002). Decisions D-007..D-009; issues I-002..I-004. In-game verification pending.
 - 2026-09-30 — Created the project Git repository (`main`); ignored `reference_shaders/` and `dist/`. I-003 resolved.
 - 2026-09-30 — Published to https://github.com/SyedMudaseerQuadri/catalyst-shader (public) with tag m1-compile-verified. No LICENSE yet (I-004).
+- 2026-10-09 — Resume: repo clean and in sync; I-002 still open (no client). Added pinned `tools/fetch_glslang.py` (SHA-256 verified).
+- 2026-10-09 — M2 materials: LabPBR 1.3 decode, tangent frame from Iris `at_tangent` (convention checked in source), GGX + correlated Smith + Schlick specular, split-sum sky reflection, `MATERIAL_MAPS` / `SPECULAR_INTENSITY` options, debug view 7. Validation PASS 2254 compilations; BRDF energy check PASS (EV-003). D-010.

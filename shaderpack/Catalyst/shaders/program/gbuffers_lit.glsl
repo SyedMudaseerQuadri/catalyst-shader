@@ -18,12 +18,14 @@
 #if defined STAGE_VERTEX
 
 in vec4 mc_Entity;
+in vec4 at_tangent; // xyz = dP/du (model space), w = bitangent sign; zero for formats without tangents
 
 out vec2 texcoord;
 out vec2 lightLevels;
 out vec4 vertexColor;
 out vec3 playerPos;
 out vec3 geoNormal;
+out vec4 tangentPlayer;
 flat out int materialClass;
 
 void main() {
@@ -34,6 +36,7 @@ void main() {
 	vec3 viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
 	playerPos = playerFromView(viewPos);
 	geoNormal = mat3(gbufferModelViewInverse) * (gl_NormalMatrix * gl_Normal);
+	tangentPlayer = vec4(mat3(gbufferModelViewInverse) * (gl_NormalMatrix * at_tangent.xyz), at_tangent.w);
 
 #if defined PROGRAM_TERRAIN
 	materialClass = materialFromBlockId(int(mc_Entity.x + 0.5));
@@ -57,9 +60,17 @@ void main() {
 
 #include "/lib/environment/state.glsl"
 #include "/lib/shadow/shadows.glsl"
+#include "/lib/atmosphere/sky.glsl"
+#include "/lib/lighting/specular.glsl"
+#include "/lib/material/labpbr.glsl"
 #include "/lib/lighting/forward.glsl"
 
 uniform sampler2D gtexture;
+// MATERIAL_MAPS is a user option; Iris only recognizes boolean options referenced by #ifdef.
+#ifdef MATERIAL_MAPS
+uniform sampler2D normals;  // LabPBR _n (Iris default when absent: flat normal, AO 1)
+uniform sampler2D specular; // LabPBR _s (Iris default when absent: all zero = no specular)
+#endif
 #if !defined PROGRAM_TERRAIN
 uniform vec4 entityColor; // hurt/creeper flash tint, alpha = strength
 #endif
@@ -69,6 +80,7 @@ in vec2 lightLevels;
 in vec4 vertexColor;
 in vec3 playerPos;
 in vec3 geoNormal;
+in vec4 tangentPlayer;
 flat in int materialClass;
 
 /* RENDERTARGETS: 0,1,2,3 */
@@ -94,37 +106,34 @@ void main() {
 	// Particles and some entity quads can carry a zero normal; never normalize a zero vector.
 	vec3 n = dot(geoNormal, geoNormal) > 1e-6 ? normalize(geoNormal) : vec3(0.0, 1.0, 0.0);
 
-	Surface s;
-	s.albedo = srgbToLinear(base.rgb);
-	s.normal = n;
-	s.light = lightLevels;
-	s.ao = ao;
-	s.materialClass = materialClass;
-	s.emission = emissionFromAlbedo(s.albedo, materialClass);
-	s.transmission = 0.0;
-	if (materialClass == MAT_FOLIAGE) {
-		// Cross-shaped plants: shade like the ground they grow from, with light passing through.
-		s.normal = vec3(0.0, 1.0, 0.0);
-		s.transmission = 0.4;
-	} else if (materialClass == MAT_LEAVES) {
-		s.transmission = 0.5;
+	Surface s = makeSurface(srgbToLinear(base.rgb), n, lightLevels, ao, materialClass);
+
+#ifdef MATERIAL_MAPS
+	// Foliage keeps its deliberate up-facing shading normal (see makeSurface).
+	mat3 tbn;
+	if (materialClass != MAT_FOLIAGE && buildTangentFrame(n, tangentPlayer, tbn)) {
+		applyLabPbrNormal(s, texture(normals, texcoord), tbn);
 	}
+	applyLabPbrSpecular(s, texture(specular, texcoord));
+#endif
 
 	EnvState env = getEnvState();
 
 	float shadow = 1.0;
 #if defined SHADOW_RECEIVER
-	float NdotL = dot(s.normal, env.lightDir);
+	// Shadow lookups use the geometric normal: normal maps must not move the receiver.
+	float NdotL = dot(s.geoNormal, env.lightDir);
 	if (NdotL > 0.0 || s.transmission > 0.0) {
-		vec3 biasNormal = NdotL >= 0.0 ? s.normal : -s.normal; // offset toward the light
+		vec3 biasNormal = NdotL >= 0.0 ? s.geoNormal : -s.geoNormal; // offset toward the light
 		shadow = sampleShadow(playerPos, biasNormal, abs(NdotL), gl_FragCoord.xy);
 	}
 #endif
 
-	outColor = vec4(shadeSurface(s, env, shadow), base.a);
+	float smoothness = max(s.f0.r, max(s.f0.g, s.f0.b)) > 0.0 ? 1.0 - sqrt(s.roughness) : 0.0;
+	outColor = vec4(shadeSurface(s, env, shadow, normalize(playerPos)), base.a);
 	outNormalLight = vec4(encodeNormal(s.normal), packLightmap(s.light), 1.0);
 	outAlbedo = vec4(base.rgb, 1.0);
-	outMaterial = vec4(float(materialClass) / 255.0, shadow, 0.0, 1.0);
+	outMaterial = vec4(float(materialClass) / 255.0, shadow, smoothness, 1.0);
 }
 
 #endif

@@ -263,6 +263,7 @@ def main() -> int:
         for v in options["SHADOW_FILTER"]["values"]:
             configs[f"SHADOW_FILTER={v}"] = {"SHADOW_FILTER": v}
         configs["SHADOWS=off"] = {"SHADOWS": "false"}
+        configs["MATERIAL_MAPS=off"] = {"MATERIAL_MAPS": "false"}
 
     # ---------------------------------------------------------------- compilation
     compiled = 0

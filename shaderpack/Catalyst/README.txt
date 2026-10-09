@@ -1,4 +1,4 @@
-Catalyst — Minecraft Java shader pack (development build 0.1.0-m1)
+Catalyst — Minecraft Java shader pack (development build 0.2.0-m2a)
 
 Requirements
   Minecraft 1.21.11, Fabric Loader, Fabric API 0.141.6, Sodium 0.8.7, Iris 1.10.7.
@@ -13,6 +13,7 @@ Presets
   The two are independent. Sliders adjust on top of the chosen visual style.
 
 Status
-  Early development build (milestone M1: minimal renderer). Sky, lighting, shadows, fog, water and
-  tonemapping are foundation versions. Clouds, weather effects, water waves, GI and reflections come later.
+  Early development build (M1 renderer + M2 materials). Sky, lighting, shadows, fog, water and
+  tonemapping are foundation versions. LabPBR 1.3 resource packs (normal/specular maps) are supported;
+  toggle under Materials. Clouds, weather effects, water waves, GI and screen-space reflections come later.
   Debug views are under Options > Debug.

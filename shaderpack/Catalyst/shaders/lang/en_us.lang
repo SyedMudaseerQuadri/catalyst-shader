@@ -22,6 +22,7 @@ value.VISUAL_PRESET.2=Cinematic
 # ---- Screens
 screen.LIGHTING=Lighting
 screen.SHADOWS_SCREEN=Shadows
+screen.MATERIALS=Materials
 screen.ATMOSPHERE=Atmosphere
 screen.COLOR=Color & Exposure
 screen.DEBUG=Debug
@@ -56,6 +57,12 @@ option.SHADOW_SOFTNESS.comment=Width of the soft shadow edge.
 option.sunPathRotation=Sun Path Angle
 option.sunPathRotation.comment=Tilts the sun's path so shadows are never perfectly axis-aligned.
 
+# ---- Materials
+option.MATERIAL_MAPS=Resource Pack Materials
+option.MATERIAL_MAPS.comment=Use normal and specular maps (LabPBR 1.3) from your resource pack. Has no effect with vanilla textures.
+option.SPECULAR_INTENSITY=Reflections
+option.SPECULAR_INTENSITY.comment=Strength of shine and sky reflections on surfaces with material data.
+
 # ---- Atmosphere
 option.FOG_DENSITY=Fog Density
 option.FOG_DENSITY.comment=Distance haze, relative to the visual style. Rain always adds more.
@@ -76,3 +83,4 @@ value.DEBUG_VIEW.3=Light Levels
 value.DEBUG_VIEW.4=Materials
 value.DEBUG_VIEW.5=Depth
 value.DEBUG_VIEW.6=Sun Shadow
+value.DEBUG_VIEW.7=Smoothness

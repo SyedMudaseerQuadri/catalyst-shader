@@ -31,6 +31,11 @@ const bool shadowHardwareFiltering = true;
 const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 30.0 40.0]
 
 // ---------------------------------------------------------------------------------------------
+// Materials: read LabPBR 1.3 normal/specular maps from the resource pack (Iris loads _n/_s textures).
+#define MATERIAL_MAPS
+#define SPECULAR_INTENSITY 1.00 // [0.00 0.25 0.50 0.75 1.00 1.25 1.50]
+
+// ---------------------------------------------------------------------------------------------
 // Artistic controls — multipliers over the visual preset (1.00 = preset default)
 #define SUN_INTENSITY 1.00 // [0.50 0.75 1.00 1.25 1.50 2.00]
 #define AMBIENT_INTENSITY 1.00 // [0.50 0.75 1.00 1.25 1.50 2.00]
@@ -43,8 +48,9 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define NIGHT_VISIBILITY 1.00 // [0.50 0.75 1.00 1.50 2.00]
 
 // ---------------------------------------------------------------------------------------------
-// Debug (docs/testing): 0 off, 1 albedo, 2 normals, 3 lightmap, 4 material id, 5 linear depth, 6 direct shadow
-#define DEBUG_VIEW 0 // [0 1 2 3 4 5 6]
+// Debug (docs/testing): 0 off, 1 albedo, 2 normals, 3 lightmap, 4 material id, 5 linear depth, 6 direct shadow,
+// 7 smoothness (LabPBR)
+#define DEBUG_VIEW 0 // [0 1 2 3 4 5 6 7]
 
 // =============================================================================================
 // Resolved visual-preset parameters (not user-facing; derived from VISUAL_PRESET only)

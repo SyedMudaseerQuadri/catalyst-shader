@@ -18,7 +18,8 @@ The package intentionally avoids speculative `tests/` and `tools/` directories b
 
 ## Shaderpack and tools
 - `shaderpack/Catalyst/` — the Iris shader pack source (`shaders/`: `lib/` shared code, `program/` stage code, `world0|world-1|world1/` per-dimension entry points).
-- `tools/validate_shaderpack.py` — offline compile of every program x preset configuration with Khronos glslang, plus pack consistency checks. Run before every checkpoint.
+- `tools/fetch_glslang.py` — installs the pinned Khronos glslang build into `tools/.cache/` (run once).
+- `tools/validate_shaderpack.py` — offline compile of every program x preset configuration with that glslang, plus pack consistency checks. Run before every checkpoint.
 - `tools/package_shaderpack.py` — builds `dist/Catalyst-<version>.zip` from runtime files only.
 
 ## Research material

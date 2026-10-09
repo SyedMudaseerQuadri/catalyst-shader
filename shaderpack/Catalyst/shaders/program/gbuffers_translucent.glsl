@@ -15,12 +15,14 @@
 #if defined STAGE_VERTEX
 
 in vec4 mc_Entity;
+in vec4 at_tangent; // xyz = dP/du (model space), w = bitangent sign
 
 out vec2 texcoord;
 out vec2 lightLevels;
 out vec4 vertexColor;
 out vec3 playerPos;
 out vec3 geoNormal;
+out vec4 tangentPlayer;
 flat out int materialClass;
 
 void main() {
@@ -31,6 +33,7 @@ void main() {
 	vec3 viewPos = (gl_ModelViewMatrix * gl_Vertex).xyz;
 	playerPos = playerFromView(viewPos);
 	geoNormal = mat3(gbufferModelViewInverse) * (gl_NormalMatrix * gl_Normal);
+	tangentPlayer = vec4(mat3(gbufferModelViewInverse) * (gl_NormalMatrix * at_tangent.xyz), at_tangent.w);
 	materialClass = materialFromBlockId(int(mc_Entity.x + 0.5));
 
 	gl_Position = ftransform();
@@ -49,16 +52,23 @@ void main() {
 
 #include "/lib/environment/state.glsl"
 #include "/lib/shadow/shadows.glsl"
-#include "/lib/lighting/forward.glsl"
 #include "/lib/atmosphere/sky.glsl"
+#include "/lib/lighting/specular.glsl"
+#include "/lib/material/labpbr.glsl"
+#include "/lib/lighting/forward.glsl"
 
 uniform sampler2D gtexture;
+#ifdef MATERIAL_MAPS
+uniform sampler2D normals;
+uniform sampler2D specular;
+#endif
 
 in vec2 texcoord;
 in vec2 lightLevels;
 in vec4 vertexColor;
 in vec3 playerPos;
 in vec3 geoNormal;
+in vec4 tangentPlayer;
 flat in int materialClass;
 
 /* RENDERTARGETS: 0 */
@@ -75,14 +85,16 @@ void main() {
 
 	vec3 n = dot(geoNormal, geoNormal) > 1e-6 ? normalize(geoNormal) : vec3(0.0, 1.0, 0.0);
 
-	Surface s;
-	s.albedo = srgbToLinear(base.rgb);
-	s.normal = n;
-	s.light = lightLevels;
-	s.ao = vertexColor.a;
-	s.materialClass = materialClass;
-	s.emission = 0.0;
-	s.transmission = 0.0;
+	Surface s = makeSurface(srgbToLinear(base.rgb), n, lightLevels, vertexColor.a, materialClass);
+
+#ifdef MATERIAL_MAPS
+	// Stained glass, ice, slime, honey: resource-pack materials apply. Water has its own model below.
+	if (materialClass != MAT_WATER) {
+		mat3 tbn;
+		if (buildTangentFrame(n, tangentPlayer, tbn)) applyLabPbrNormal(s, texture(normals, texcoord), tbn);
+		applyLabPbrSpecular(s, texture(specular, texcoord));
+	}
+#endif
 
 	EnvState env = getEnvState();
 
@@ -92,7 +104,7 @@ void main() {
 	if (NdotL > 0.0) shadow = sampleShadow(playerPos, n, NdotL, gl_FragCoord.xy);
 #endif
 
-	vec3 color = shadeSurface(s, env, shadow);
+	vec3 color = shadeSurface(s, env, shadow, normalize(playerPos));
 	float alpha = base.a;
 
 	if (materialClass == MAT_WATER) {

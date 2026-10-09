@@ -65,8 +65,10 @@ vec3 debugView(vec3 displayColor) {
 		return hasData ? materialDebugColor(int(material.r * 255.0 + 0.5)) : vec3(0.0);
 	#elif DEBUG_VIEW == 5
 		return vec3(saturate(linearizeDepth(texture(depthtex0, uv).r) / far));
-	#else
+	#elif DEBUG_VIEW == 6
 		return hasData ? vec3(material.g) : vec3(1.0);
+	#else
+		return hasData ? vec3(material.b) : vec3(0.0); // smoothness; black = no specular data
 	#endif
 #endif
 }

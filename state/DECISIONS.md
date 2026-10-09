@@ -56,3 +56,10 @@ Internal tiers: `INTERNAL_TIER` = `PERF_PROFILE` (hidden option, set only by pro
 Iris turns any `#define X` that some line tests with `#ifdef X` / `#ifndef X` into a boolean menu option
 (checked in the source, EV-001). Include guards, stage, dimension and program flags therefore use `#if defined X`.
 Only real user options (currently `SHADOWS`) are tested with `#ifdef`. `tools/validate_shaderpack.py` enforces this.
+
+## D-010 — LabPBR 1.3 is the material input format; vanilla textures get no specular
+Catalyst reads resource-pack materials only in the LabPBR 1.3 layout (`lib/material/labpbr.glsl`), the format
+the architecture doc names as the preferred baseline. Without material data (f0 = 0, Iris default) surfaces are
+purely diffuse, so vanilla textures keep their look (Minecraft identity). Specular is GGX + correlated Smith +
+Schlick with a split-sum sky reflection. Single-scattering energy loss at high roughness is accepted for now (EV-003).
+Option `MATERIAL_MAPS` (default on) skips the two texture reads when disabled. It is not tied to a performance profile.

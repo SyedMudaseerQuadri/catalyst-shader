@@ -4,7 +4,7 @@ Re-run this check at the start of every session — do not trust a stale result;
 environment or the human's setup may have changed since the last session. Test and record
 each item; never assume a capability exists or is absent without actually attempting it.
 
-Last checked: 2026-09-30 (Claude Code session on the user's Windows 11 machine).
+Last checked: 2026-10-09 (Claude Code session on the user's Windows 11 machine). Minecraft client still not installed.
 
 | Capability | Status | Evidence |
 |---|---|---|
@@ -12,7 +12,7 @@ Last checked: 2026-09-30 (Claude Code session on the user's Windows 11 machine).
 | Script execution | AVAILABLE | Python 3.14 and Git Bash ran `tools/*.py` |
 | Network/internet access | AVAILABLE | GitHub API and raw file downloads succeeded |
 | Access to current official Iris documentation / live public sources | AVAILABLE | Iris source read from GitHub branch `1.21.11` (EV-001) |
-| GLSL/Iris compiler or validator (e.g. `glslangValidator` or equivalent) | PARTIAL | Khronos glslang 16.6.0 downloaded to the session scratchpad (not installed system-wide); validates GLSL, not Iris patching (EV-002) |
+| GLSL/Iris compiler or validator (e.g. `glslangValidator` or equivalent) | PARTIAL | Khronos glslang 16.6.0, pinned by SHA-256, installed by `tools/fetch_glslang.py` into `tools/.cache/`; validates GLSL, not Iris patching (EV-002, EV-003) |
 | Shader compilation | PARTIAL | Reference-compiler only; no GPU driver compile |
 | Launchable Minecraft + Iris client with GPU rendering | UNAVAILABLE | `%APPDATA%/.minecraft` holds only an SKLauncher folder; no Fabric/Iris/Sodium install found |
 | Screenshot capture | UNAVAILABLE | Depends on the client |
