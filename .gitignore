@@ -13,3 +13,6 @@ __pycache__/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Pinned glslang download (tools/fetch_glslang.py)
+/tools/.cache/

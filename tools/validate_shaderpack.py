@@ -15,6 +15,7 @@ What a PASS here does NOT prove (record as a limitation, never as runtime eviden
   - runtime behavior, visuals or performance.
 
 Usage:
+  python tools/fetch_glslang.py            # once: pinned compiler into tools/.cache/
   python tools/validate_shaderpack.py [--glslang PATH] [--pack shaderpack/Catalyst] [--quick]
 Exit code 0 = all checks passed.
 """
@@ -170,7 +171,10 @@ def compile_one(glslang: str, lines: list[str], stage: str, label: str, tmpdir: 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--pack", default=str(Path(__file__).resolve().parent.parent / "shaderpack" / "Catalyst"))
-    ap.add_argument("--glslang", default=os.environ.get("GLSLANG") or shutil.which("glslang") or shutil.which("glslangValidator"))
+    cached = Path(__file__).resolve().parent / ".cache" / "glslang" / "bin" / ("glslang.exe" if os.name == "nt" else "glslang")
+    ap.add_argument("--glslang", default=os.environ.get("GLSLANG") or (str(cached) if cached.exists() else None)
+                    or shutil.which("glslang") or shutil.which("glslangValidator"),
+                    help="defaults to the pinned build from tools/fetch_glslang.py")
     ap.add_argument("--quick", action="store_true", help="default configuration only")
     args = ap.parse_args()
 
@@ -263,7 +267,7 @@ def main() -> int:
     # ---------------------------------------------------------------- compilation
     compiled = 0
     if not args.glslang:
-        problems.append("glslang not found: pass --glslang or set GLSLANG (compilation NOT checked)")
+        problems.append("glslang not found: run tools/fetch_glslang.py, pass --glslang or set GLSLANG (compilation NOT checked)")
     else:
         with tempfile.TemporaryDirectory() as td:
             tmpdir = Path(td)
