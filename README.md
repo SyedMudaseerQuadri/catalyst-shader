@@ -16,6 +16,10 @@ Performance: Performance / Balanced / Quality / Ultra / Cinematic.
 ## Context policy
 The package intentionally avoids speculative `tests/` and `tools/` directories before durable implementation assets exist. When real tooling or test assets are created, add them deliberately and document their maintained purpose. Testing methodology lives under `docs/testing/`; persistent evidence lives under `state/evidence/`.
 
+## Install a build
+Download `Catalyst-<version>.zip` from the repository's **Releases** page (not "Code > Download ZIP", which contains
+the whole development repository) and put it in `.minecraft/shaderpacks/`.
+
 ## Shaderpack and tools
 - `shaderpack/Catalyst/` — the Iris shader pack source (`shaders/`: `lib/` shared code, `program/` stage code, `world0|world-1|world1/` per-dimension entry points).
 - `tools/fetch_glslang.py` — installs the pinned Khronos glslang build into `tools/.cache/` (run once).

@@ -3,7 +3,7 @@
 // Model: zenith-to-horizon gradient + a horizon brightening band + a forward-scattering halo around
 // the sun. Colors come from the shared EnvState: the sun's transmittance tints the horizon at low sun,
 // so sunsets emerge from the same physics that color the sunlight. The biome's vanilla sky color is
-// blended in by PRESET_VANILLA_SKY_BLEND to keep Minecraft's per-biome identity.
+// blended in by PRESET_SKY_DOME_VANILLA to keep Minecraft's per-biome identity (blue skies stay blue).
 // Units: scene-linear radiance, same scale as lighting.
 // Requires: settings.glsl, core/common.glsl, environment/state.glsl.
 
@@ -29,11 +29,12 @@ vec3 skyRadiance(vec3 dir, EnvState env) {
 	vec3 sunTint = env.sunRadiance / max(max(env.sunRadiance.r, max(env.sunRadiance.g, env.sunRadiance.b)), 1e-4);
 
 	// Daytime gradient, blended with the biome's vanilla sky color for identity.
-	vec3 zenithDay  = mix(vec3(0.16, 0.32, 0.80), vanillaSkyLinear(), PRESET_VANILLA_SKY_BLEND);
-	vec3 horizonDay = mix(vec3(0.60, 0.72, 0.92), vanillaSkyLinear() * 1.4 + 0.15, PRESET_VANILLA_SKY_BLEND);
+	vec3 zenithDay  = mix(vec3(0.16, 0.32, 0.80), vanillaSkyLinear(), PRESET_SKY_DOME_VANILLA);
+	vec3 horizonDay = mix(vec3(0.60, 0.72, 0.92), vanillaSkyLinear() * 1.4 + 0.15, PRESET_SKY_DOME_VANILLA);
 
 	float horizonBand = exp(-aboveHorizon * 5.0);
-	vec3 daySky = mix(zenithDay, horizonDay, horizonBand) * 2.0;
+	// The clear sky brightens as the sun climbs (same scale as the sky ambient light in state.glsl).
+	vec3 daySky = mix(zenithDay, horizonDay, horizonBand) * 1.9 * daylightSkyScale(env.sunElevation);
 
 	// Low sun: warm the horizon on the sun's side, cool the anti-solar side.
 	float towardSun = saturate(dot(normalize(vec3(dir.x, 0.0, dir.z) + 1e-5), normalize(vec3(env.sunDir.x, 0.0, env.sunDir.z) + 1e-5)) * 0.5 + 0.5);

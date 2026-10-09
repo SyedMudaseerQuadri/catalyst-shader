@@ -20,15 +20,20 @@
 #if !defined CATALYST_LIGHTING_FORWARD
 #define CATALYST_LIGHTING_FORWARD
 
-// Perceptual falloff for Minecraft's linear 0..15 block light levels. Steeper than linear so light
-// pools read as pools, with a small lift so level 1-3 stays distinguishable from darkness.
+// Light-level falloff. Minecraft's own light curve is applied to DISPLAY brightness, so in linear light a
+// mid level is far darker than its level number suggests (level 8 is ~0.04 linear in vanilla). These powers
+// keep that vanilla character - defined pools of torch light, interiors darker than outdoors - while staying
+// slightly brighter than vanilla for readability. Tuned in tools/tone_sim.py (EV-005).
+const float BLOCK_LIGHT_FALLOFF_POWER = 4.0;
+const float SKY_LIGHT_FALLOFF_POWER = 3.5;
+
 float blockLightFalloff(float level01) {
-	return pow(level01, 2.6) + 0.02 * level01;
+	return pow(level01, BLOCK_LIGHT_FALLOFF_POWER) + 0.02 * level01;
 }
 
 // Sky light arriving through the local opening; vanilla sky level already encodes how "open" the spot is.
 float skyLightFalloff(float level01) {
-	return level01 * level01;
+	return pow(level01, SKY_LIGHT_FALLOFF_POWER);
 }
 
 // Direct light mask: shadow maps only cover the area near the player and do not know about caves
@@ -38,7 +43,7 @@ float directSkyAccess(float skyLevel) {
 }
 
 // Share of the multi-bounce term (0 = plain occlusion, 1 = full fit). Stands in for GI until M5.
-const float BOUNCE_STRENGTH = 0.55;
+const float BOUNCE_STRENGTH = 0.35;
 
 // Multi-bounce occlusion fit (Jimenez et al. 2016, "Practical Real-Time Strategies for Accurate Indirect
 // Occlusion"): occluded light is partly bounced back by nearby surfaces of similar albedo, so occlusion
@@ -84,7 +89,7 @@ vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir)
 	vec3 sky = env.skyAmbient * skyVisibility * multiBounce(skyLightFalloff(s.light.y) * s.ao, s.albedo);
 #endif
 
-	vec3 block = env.blockLightColor * blockLightFalloff(s.light.x);
+	vec3 block = blockLightTint(env.blockLightColor, s.light.x) * blockLightFalloff(s.light.x);
 
 	// Readability floor: near-neutral (slightly warm) so it never cools or greys out surfaces.
 	float floorLevel = max(PRESET_MIN_AMBIENT * NIGHT_VISIBILITY, READABILITY_MIN_AMBIENT);

@@ -35,6 +35,7 @@ void main() {
 #if defined STAGE_FRAGMENT
 
 #include "/lib/environment/state.glsl"
+#include "/lib/atmosphere/sky.glsl"
 
 #if !defined PROGRAM_BASIC
 uniform sampler2D gtexture;
@@ -64,12 +65,15 @@ void main() {
 
 	#if defined PROGRAM_CLOUDS
 		vec3 n = dot(geoNormal, geoNormal) > 1e-6 ? normalize(geoNormal) : vec3(0.0, 1.0, 0.0);
-		// Clouds are thick scattering media: soft wrapped direct light plus a strong sky term.
+		// Clouds are thick scattering media: soft wrapped direct light, sky ambient, and light scattered in from
+		// the sky dome above. The sky term keeps clouds from ever being darker than the sky behind them
+		// (EV-005: night clouds rendered as black holes).
 		float wrapped = saturate(dot(n, env.lightDir) * 0.5 + 0.5);
-		vec3 lit = env.lightRadiance * wrapped * 0.6 + env.skyAmbient * 1.6 + vec3(0.004);
+		vec3 skyAbove = skyRadiance(vec3(0.0, 1.0, 0.0), env);
+		vec3 lit = env.lightRadiance * wrapped * 0.7 + env.skyAmbient + skyAbove * 0.6 + vec3(0.004);
 		outColor = vec4(albedo * lit, c.a);
 	#elif defined PROGRAM_WEATHER
-		vec3 lit = env.skyAmbient * 1.2 + env.lightRadiance * 0.15 + env.blockLightColor * pow(lightLevels.x, 2.6);
+		vec3 lit = env.skyAmbient * 1.2 + env.lightRadiance * 0.15 + blockLightTint(env.blockLightColor, lightLevels.x) * pow(lightLevels.x, 4.0);
 		outColor = vec4(albedo * lit, c.a * 0.7);
 	#else
 		outColor = vec4(albedo * UNLIT_RADIANCE, c.a);

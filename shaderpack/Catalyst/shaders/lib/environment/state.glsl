@@ -52,10 +52,23 @@ vec3 atmosphericTransmittance(float airmass, float aerosol) {
 	return exp(-(RAYLEIGH_ZENITH_DEPTH + aerosol) * airmass);
 }
 
-// Daytime sky-ambient luminance (noon sun luminance is ~2.5 in scene units).
-const float SKY_AMBIENT_LUM = 0.55;
+// Noon sky-ambient luminance (noon sun luminance is ~2.5 in scene units: ~3.7:1 open ground sun-to-sky).
+const float SKY_AMBIENT_NOON = 0.70;
 // Fraction of the biome sky color's saturation that tints ambient light (raw vanilla sky is very saturated).
 const float SKY_TINT_SATURATION = 0.25;
+
+// The clear sky (both the visible dome and its irradiance) is dimmer when the sun is low; used by sky.glsl too.
+float daylightSkyScale(float sunElevation) {
+	return 0.40 + 0.60 * smoothstep(0.0, 0.85, sunElevation);
+}
+
+// Block light color for a 0..1 block-light level: warmer as it dims, closer to warm white at full strength
+// (matches the observed vanilla behavior that dim torch light reads orange). Luminance stays that of
+// env.blockLightColor, so only the hue depends on the level.
+vec3 blockLightTint(vec3 fullColor, float level) {
+	vec3 hue = mix(vec3(1.00, 0.52, 0.24), vec3(1.00, 0.80, 0.58), saturate(level));
+	return hue / luminance(hue) * luminance(fullColor);
+}
 
 // Iris supplies the biome/weather vanilla colors in sRGB; bring them into the working space.
 vec3 vanillaSkyLinear() { return srgbToLinear(clamp(skyColor, 0.0, 1.0)); }
@@ -121,12 +134,12 @@ EnvState getEnvState() {
 
 	// Sky ambient: the irradiance from the whole sky hemisphere plus ground bounce is only mildly blue, so the
 	// hue stays close to neutral; the biome's vanilla sky color adds a desaturated tint (Minecraft identity).
-	// Level: ~4.5:1 noon sun-to-sky ratio (a clear-day value), so shade is never artificially black.
+	// Level: ~3.7:1 open-ground sun-to-sky ratio at noon (a clear-day value), so shade is never artificially black.
 	// Tuned with tools/tone_sim.py against the in-game screenshots (state/evidence/ingame_2026-10-09.md).
 	vec3 biomeSky = vanillaSkyLinear() / max(luminance(vanillaSkyLinear()), 1e-4);
 	biomeSky = 1.0 + (biomeSky - 1.0) * SKY_TINT_SATURATION;
 	vec3 dayHue = mix(vec3(0.80, 0.90, 1.10), biomeSky, PRESET_VANILLA_SKY_BLEND);
-	vec3 dayAmbient = dayHue / max(luminance(dayHue), 1e-4) * SKY_AMBIENT_LUM;
+	vec3 dayAmbient = dayHue / max(luminance(dayHue), 1e-4) * SKY_AMBIENT_NOON * daylightSkyScale(env.sunElevation);
 	vec3 twilightAmbient = vec3(0.35, 0.28, 0.30) * 0.25;
 	vec3 nightAmbient = vec3(0.10, 0.14, 0.26) * 0.10 * NIGHT_VISIBILITY;
 	vec3 ambient = mix(nightAmbient, dayAmbient, env.day);

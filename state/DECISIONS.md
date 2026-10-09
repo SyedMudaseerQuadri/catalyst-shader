@@ -70,3 +70,12 @@ From the first in-game test (EV-004): (1) sky ambient is a near-neutral, desatur
 `BOUNCE_STRENGTH` 0.55) as the stand-in for GI until M5; (3) exposure adapts partially (`EXPOSURE_ADAPTATION`,
 default 0.5) between a fixed daylight reference and the scene estimate, so interiors, caves and night stay
 naturally darker. Constants are tuned with `tools/tone_sim.py`, which must be kept in sync with the shader formulas.
+
+## D-012 — Tone pipeline v2 (supersedes the exposure part of D-011)
+From EV-005, tuned in `tools/tone_sim.py` after calibrating its 0.2.1 model against the screenshots:
+(1) tonemap = per-channel linear-to-knee (0.55) + exponential shoulder, replacing Reinhard;
+(2) exposure = daylight normalization on open-ground irradiance (strength 0.85 by day, 0.55 at night, anchored at
+noon 3.10) x subtle local adaptation (`EXPOSURE_ADAPTATION` default 0.15);
+(3) clear-sky dome and sky ambient scale with sun height (`daylightSkyScale`), dome uses `PRESET_SKY_DOME_VANILLA`;
+(4) block/sky light falloff powers 4.0 / 3.5 (vanilla's curve lives in display space) and block-light hue that warms
+as it dims; multi-bounce strength 0.35; (5) clouds include sky in-scatter so they are never darker than the sky.

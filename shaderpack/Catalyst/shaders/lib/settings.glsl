@@ -45,8 +45,9 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define SATURATION 1.00 // [0.70 0.80 0.90 1.00 1.10 1.20 1.30]
 #define CONTRAST 1.00 // [0.80 0.90 1.00 1.10 1.20]
 #define EXPOSURE_BIAS 0.0 // [-2.0 -1.5 -1.0 -0.5 0.0 0.5 1.0 1.5 2.0]
-// Eye adaptation: 0 = fixed exposure, 1 = full adaptation (every scene normalized to the same brightness).
-#define EXPOSURE_ADAPTATION 0.50 // [0.00 0.25 0.50 0.75 1.00]
+// Local eye adaptation between bright and dark places (interiors, caves). Daylight changes over the day
+// are normalized separately. 0 = none (interiors keep their natural darkness), 1 = full.
+#define EXPOSURE_ADAPTATION 0.15 // [0.00 0.10 0.15 0.25 0.35 0.50]
 #define NIGHT_VISIBILITY 1.00 // [0.50 0.75 1.00 1.50 2.00]
 
 // ---------------------------------------------------------------------------------------------
@@ -59,7 +60,8 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 // =============================================================================================
 #if VISUAL_PRESET == 0
 	// Vanilla Enhanced — closest to Minecraft identity.
-	const float PRESET_VANILLA_SKY_BLEND   = 0.60; // weight of the biome's vanilla sky color
+	const float PRESET_VANILLA_SKY_BLEND   = 0.60; // weight of the biome's vanilla sky color in ambient light
+	const float PRESET_SKY_DOME_VANILLA    = 0.80; // weight of the biome's vanilla sky color in the visible sky
 	const float PRESET_AEROSOL            = 0.06; // haze optical depth; warms low sun
 	const float PRESET_FOG_DENSITY        = 0.60;
 	const float PRESET_SATURATION         = 1.00;
@@ -70,6 +72,7 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #elif VISUAL_PRESET == 2
 	// Cinematic — stronger atmosphere and contrast, still readable.
 	const float PRESET_VANILLA_SKY_BLEND   = 0.20;
+	const float PRESET_SKY_DOME_VANILLA    = 0.45;
 	const float PRESET_AEROSOL            = 0.11;
 	const float PRESET_FOG_DENSITY        = 1.40;
 	const float PRESET_SATURATION         = 1.06;
@@ -80,6 +83,7 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #else
 	// Natural / Realistic — default target (~60% natural / 40% cinematic).
 	const float PRESET_VANILLA_SKY_BLEND   = 0.35;
+	const float PRESET_SKY_DOME_VANILLA    = 0.60;
 	const float PRESET_AEROSOL            = 0.08;
 	const float PRESET_FOG_DENSITY        = 1.00;
 	const float PRESET_SATURATION         = 1.02;

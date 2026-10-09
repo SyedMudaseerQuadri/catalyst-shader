@@ -21,5 +21,18 @@ The agent still cannot run the game itself, so every visual change needs a user 
 The release zip ships without a LICENSE. The license is a product decision for the human. Also confirm that no
 reference pack license affects Catalyst (no reference source was used; see docs/research/provenance.md).
 
-## I-005 — Interiors washed out and grey (FIXED in 0.2.1, awaiting re-test)
-Found in EV-004. Cause and fix recorded there. Close after an in-game re-test of the same room matches the goals.
+## I-005 — Interiors washed out and flat (0.2.1 fix insufficient; reworked in 0.3.0, awaiting re-test)
+EV-004's "grey wood" diagnosis was wrong (the blocks are neutral white, EV-005). Real cause: light-level falloff in
+linear light (~5x brighter than vanilla at mid levels) + full adaptation. 0.3.0: vanilla-like falloff powers,
+level-dependent block-light hue, subtle local adaptation. Close after an F2 re-test.
+
+## I-006 — Room lighting source unconfirmed
+The Light Levels debug suggests the test room is lit by block light, not sky light. Needs the F3 "Light" readout
+(sky/block) on the room floor and what is in the doorways. 0.3.0 interior tuning assumes block ~0.55, sky ~0.15.
+
+## I-007 — Screenshot capture alters colors
+Snipping-tool captures (Windows HDR/color management) shift mid-tones and primaries (EV-005). Use F2 screenshots
+for evidence. Comparisons made with the same capture stay valid.
+
+## I-008 — Daytime outdoor too dark/dull, night clouds black (FIXED in 0.3.0, awaiting re-test)
+EV-005. Shoulder tonemap, daylight-normalized exposure, sun-scaled sky dome/ambient, brighter clouds with sky in-scatter.

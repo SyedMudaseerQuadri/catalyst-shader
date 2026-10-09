@@ -19,7 +19,10 @@ Git checkpoints: tag `m1-compile-verified`, then tag `m2-materials-compile-verif
 - Shader runtime: loads in-game (EV-004). Debug views PASS. Normal-view look: interior REWORK fixed in 0.2.1, re-test pending. Performance: UNVERIFIED.
 - Cross-vendor GPU validation: not available.
 
-## In-game check list (EV-004 done for 0.2.0-m2a; record the next run as EV-005)
+## In-game test protocol (EV-004: 0.2.0-m2a, EV-005: 0.2.1; record the next run as EV-006)
+Use **F2** screenshots (not a snipping tool), Debug View = Off, profile **Balanced**, `/weather clear`, the same
+camera spots, times `/time set 1000`, `6000`, `12500`, `18000`; FPS overlay visible. Scenes: the white room,
+the cherry-grove view, water, a cave with a torch, the Nether. Pair each with a vanilla F2 shot from the same spot.
 1. Pack loads with no errors in `logs/latest.log` (search "Iris" / "shader").
 2. Overworld noon, sunset, night, rain: sky, sun/moon, shadows and fog look plausible; no black or NaN pixels.
 3. Nether and End load (no shadow pass there) with readable lighting.

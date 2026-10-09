@@ -35,6 +35,6 @@ Shading model: **forward shading in gbuffers** (decision D-007). Fullscreen pass
 | 6 | gbuffers_water / hand_water | forward-lit translucents (LabPBR for glass/ice/slime/honey); water Fresnel sky reflection + sun glint | textures, LabPBR maps, shadowtex0, EnvState | colortex0 (blend) | full | none | — | — | UNMEASURED |
 | 7 | gbuffers_weather / textured / basic | rain/snow, unlit glows, outlines | textures, EnvState | colortex0 (blend) | full | none | — | — | UNMEASURED |
 | 8 | composite | aerial perspective, border fog, medium fog (water/lava/powder snow), blindness/darkness | colortex0, depthtex0, EnvState | colortex0 | full | none | — | — | UNMEASURED |
-| 9 | final | model-based exposure, contrast/saturation, extended-Reinhard tonemap, sRGB encode, dither, debug views | colortex0-3, depthtex0 | screen | full | none | — | 0-6 | UNMEASURED |
+| 9 | final | model-based exposure (daylight normalization x local adaptation), contrast/saturation, knee+shoulder tonemap, sRGB encode, dither, debug views | colortex0-3, depthtex0 | screen | full | none | — | 0-6 | UNMEASURED |
 
 The Nether (world-1) and End (world1) use the same graph without pass 1.

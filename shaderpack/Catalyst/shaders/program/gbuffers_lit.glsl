@@ -110,7 +110,7 @@ void main() {
 
 #ifdef MATERIAL_MAPS
 	// Foliage keeps its deliberate up-facing shading normal (see makeSurface).
-	mat3 tbn;
+	mat3 tbn = mat3(1.0); // initialized: buildTangentFrame may be skipped (NVIDIA C7050)
 	if (materialClass != MAT_FOLIAGE && buildTangentFrame(n, tangentPlayer, tbn)) {
 		applyLabPbrNormal(s, texture(normals, texcoord), tbn);
 	}
@@ -126,6 +126,8 @@ void main() {
 	if (NdotL > 0.0 || s.transmission > 0.0) {
 		vec3 biasNormal = NdotL >= 0.0 ? s.geoNormal : -s.geoNormal; // offset toward the light
 		shadow = sampleShadow(playerPos, biasNormal, abs(NdotL), gl_FragCoord.xy);
+	} else {
+		shadow = 0.0; // faces turned away from the light receive no direct light (Sun Shadow debug view)
 	}
 #endif
 

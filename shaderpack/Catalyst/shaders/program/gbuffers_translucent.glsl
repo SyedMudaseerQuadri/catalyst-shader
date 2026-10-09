@@ -90,7 +90,7 @@ void main() {
 #ifdef MATERIAL_MAPS
 	// Stained glass, ice, slime, honey: resource-pack materials apply. Water has its own model below.
 	if (materialClass != MAT_WATER) {
-		mat3 tbn;
+		mat3 tbn = mat3(1.0); // initialized: buildTangentFrame may be skipped (NVIDIA C7050)
 		if (buildTangentFrame(n, tangentPlayer, tbn)) applyLabPbrNormal(s, texture(normals, texcoord), tbn);
 		applyLabPbrSpecular(s, texture(specular, texcoord));
 	}
