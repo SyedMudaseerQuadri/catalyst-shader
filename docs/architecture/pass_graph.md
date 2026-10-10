@@ -31,7 +31,7 @@ Shading model: **forward shading in gbuffers** (decision D-007). Fullscreen pass
 | 2 | gbuffers_skybasic / skytextured | analytic sky, stars, sun/moon disks | EnvState | colortex0 | full | none | deferred fills uncovered pixels | — | UNMEASURED |
 | 3 | gbuffers_clouds | vanilla clouds lit by EnvState | cloud geometry | colortex0 (blend) | full | none | — | — | UNMEASURED |
 | 4 | gbuffers_terrain / block / entities / hand / textured_lit | (all geometry except sky and lines: sub-pixel Halton jitter when `TAA` is on) forward-lit opaque and cutout geometry (diffuse + GGX specular + sky reflection) + G-buffer data | textures, LabPBR normals/specular, lightmap, AO, shadowtex0, EnvState | colortex0-3 | full | none | — | 1-4, 6 | UNMEASURED |
-| 5 | deferred | fill sky where no sky geometry drew (alpha 0) | colortex0, depthtex0 | colortex0 | full | none | — | — | UNMEASURED |
+| 5 | deferred | fill sky where no sky geometry drew (alpha 0); volumetric cumulus + cirrus over sky and terrain beyond the clouds (`lib/atmosphere/clouds.glsl`, steps by tier) | colortex0, depthtex0, EnvState | colortex0 | full | dithered start, resolved by TAA | `CLOUD_STYLE` 0/1 skip it | — | UNMEASURED |
 | 6 | gbuffers_water / hand_water | forward-lit translucents (LabPBR for glass/ice/slime/honey); water Fresnel sky reflection + sun glint | textures, LabPBR maps, shadowtex0, EnvState | colortex0 (blend) | full | none | — | — | UNMEASURED |
 | 7 | gbuffers_weather / textured / basic | rain/snow, unlit glows, outlines | textures, EnvState | colortex0 (blend) | full | none | — | — | UNMEASURED |
 | 8 | composite | aerial perspective, border fog, medium fog (water/lava/powder snow), blindness/darkness | colortex0, depthtex0, EnvState | colortex0 | full | none | — | — | UNMEASURED |

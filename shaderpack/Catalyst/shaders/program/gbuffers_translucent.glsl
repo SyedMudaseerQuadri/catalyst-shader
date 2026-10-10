@@ -57,6 +57,8 @@ void main() {
 #include "/lib/lighting/specular.glsl"
 #include "/lib/material/labpbr.glsl"
 #include "/lib/lighting/forward.glsl"
+#include "/lib/atmosphere/clouds.glsl"
+#include "/lib/material/weather_surface.glsl"
 
 uniform sampler2D gtexture;
 #ifdef MATERIAL_MAPS
@@ -98,12 +100,14 @@ void main() {
 #endif
 
 	EnvState env = getEnvState();
+	if (materialClass != MAT_WATER) applyWeatherToSurface(s, playerPos + cameraPosition, env);
 
 	float shadow = 1.0;
 	float NdotL = dot(n, env.lightDir);
 #if defined SHADOW_RECEIVER
 	if (NdotL > 0.0) shadow = sampleShadow(playerPos, n, NdotL, gl_FragCoord.xy);
 #endif
+	shadow *= cloudShadow(playerPos, env);
 
 	vec3 color = shadeSurface(s, env, shadow, normalize(playerPos));
 	float alpha = base.a;

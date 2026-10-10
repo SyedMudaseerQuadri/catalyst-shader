@@ -14,11 +14,14 @@
 #include "/lib/core/encode.glsl"
 #include "/lib/material/classify.glsl"
 #include "/lib/post/taa.glsl"
+#include "/lib/core/noise.glsl"
+#include "/lib/environment/wind.glsl"
 
 // =============================================================================================
 #if defined STAGE_VERTEX
 
 in vec4 mc_Entity;
+in vec2 mc_midTexCoord; // atlas center of the sprite: tells top vertices of plants from rooted ones
 in vec4 at_tangent; // xyz = dP/du (model space), w = bitangent sign; zero for formats without tangents
 
 out vec2 texcoord;
@@ -41,11 +44,17 @@ void main() {
 
 #if defined PROGRAM_TERRAIN
 	materialClass = materialFromBlockId(int(mc_Entity.x + 0.5));
+	vec4 clip = ftransform();
+	if (materialClass == MAT_FOLIAGE || materialClass == MAT_LEAVES) {
+		// Same displacement as the shadow pass (program/shadow.glsl), so shadows sway with the plants.
+		playerPos += foliageWindOffsetFor(playerPos + cameraPosition, materialClass, texcoord.y < mc_midTexCoord.y);
+		clip = gl_ProjectionMatrix * (gbufferModelView * vec4(playerPos, 1.0));
+	}
+	gl_Position = taaJitterClip(clip);
 #else
 	materialClass = MAT_ENTITY;
-#endif
-
 	gl_Position = taaJitterClip(ftransform());
+#endif
 }
 
 #endif
@@ -65,6 +74,8 @@ void main() {
 #include "/lib/lighting/specular.glsl"
 #include "/lib/material/labpbr.glsl"
 #include "/lib/lighting/forward.glsl"
+#include "/lib/atmosphere/clouds.glsl"
+#include "/lib/material/weather_surface.glsl"
 
 uniform sampler2D gtexture;
 // MATERIAL_MAPS is a user option; Iris only recognizes boolean options referenced by #ifdef.
@@ -119,6 +130,9 @@ void main() {
 #endif
 
 	EnvState env = getEnvState();
+#if defined PROGRAM_TERRAIN
+	applyWeatherToSurface(s, playerPos + cameraPosition, env);
+#endif
 
 	float shadow = 1.0;
 #if defined SHADOW_RECEIVER
@@ -131,6 +145,7 @@ void main() {
 		shadow = 0.0; // faces turned away from the light receive no direct light (Sun Shadow debug view)
 	}
 #endif
+	shadow *= cloudShadow(playerPos, env);
 
 	float smoothness = max(s.f0.r, max(s.f0.g, s.f0.b)) > 0.0 ? 1.0 - sqrt(s.roughness) : 0.0;
 	outColor = vec4(shadeSurface(s, env, shadow, normalize(playerPos)), base.a);

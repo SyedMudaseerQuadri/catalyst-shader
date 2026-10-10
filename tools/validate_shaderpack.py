@@ -266,6 +266,8 @@ def main() -> int:
         configs["SHADOWS=off"] = {"SHADOWS": "false"}
         configs["MATERIAL_MAPS=off"] = {"MATERIAL_MAPS": "false"}
         configs["TAA=off"] = {"TAA": "false"}
+        for v in options["CLOUD_STYLE"]["values"]:
+            configs[f"CLOUD_STYLE={v}"] = {"CLOUD_STYLE": v}
 
     # ---------------------------------------------------------------- compilation
     compiled = 0

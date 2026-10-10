@@ -45,6 +45,13 @@ vec3 applyAtmosphericFog(vec3 color, vec3 playerPos, bool isSky, EnvState env) {
 		float worldHeight = playerPos.y * 0.5 + cameraPosition.y; // midpoint of the ray, cheap estimate
 		float heightFactor = exp(-max(worldHeight - SEA_LEVEL, 0.0) / 60.0);
 		float density = 0.0011 * heightFactor * (1.0 + 4.0 * env.rain + 2.0 * env.storm);
+		// Low mist: forms around sunrise (sun low in the east, +X) and while the ground is wet after rain,
+		// and settles in valleys (it thins quickly above sea level), so it never covers mountain views.
+		float morning = smoothstep(-0.10, 0.02, env.sunElevation) * (1.0 - smoothstep(0.10, 0.35, env.sunElevation))
+		              * step(0.0, env.sunDir.x);
+		float mistAmount = saturate(morning * 0.9 + env.surfaceWet * 0.6 * (1.0 - env.rain));
+		float mistHeight = exp(-max(worldHeight - SEA_LEVEL, 0.0) / 14.0);
+		density += 0.0045 * mistAmount * mistHeight;
 #endif
 		density *= PRESET_FOG_DENSITY * FOG_DENSITY;
 		fogAmount = 1.0 - exp(-density * dist);

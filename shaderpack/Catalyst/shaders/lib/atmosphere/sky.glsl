@@ -57,6 +57,9 @@ vec3 skyRadiance(vec3 dir, EnvState env) {
 	float greyLevel = luminance(sky) * 0.9 + 0.02 * env.day;
 	sky = mix(sky, vec3(greyLevel), env.overcast * 0.85) * (1.0 - 0.45 * env.storm);
 
+	// Lightning lights the whole sky briefly (the clouds add their own flash in clouds.glsl).
+	sky += vec3(0.55, 0.60, 0.75) * env.lightningFlash * 0.6;
+
 	// Below the horizon fade to a dim ground-bounce color so the lower hemisphere is never pure black.
 	float belowHorizon = saturate(-up * 4.0);
 	sky = mix(sky, horizonDay * 0.25 * env.day + nightSky, belowHorizon);

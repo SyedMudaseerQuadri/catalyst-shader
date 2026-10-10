@@ -97,6 +97,11 @@ vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir)
 
 	vec3 indirect = sky * PRESET_SHADOW_AMBIENT + (block + readabilityFloor) * aoBounce;
 
+#if defined DIM_OVERWORLD
+	// Lightning: a brief, bluish-white light from the sky, reaching what the sky reaches.
+	indirect += vec3(0.75, 0.82, 1.00) * 1.6 * env.lightningFlash * skyVisibility * skyLightFalloff(s.light.y) * s.ao;
+#endif
+
 	// Night vision (vanilla effect) lifts all indirect light.
 	indirect += nightVision * 0.25 * aoBounce;
 

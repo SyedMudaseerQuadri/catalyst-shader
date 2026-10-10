@@ -49,7 +49,9 @@ void applyLabPbrSpecular(inout Surface s, vec4 specularTex) {
 
 	float b = specularTex.b * 255.0;
 	if (b >= 64.5) s.transmission = max(s.transmission, (b - 65.0) / 190.0);
-	// Porosity (0..64) is decoded when wetness exists (M3).
+	// Porosity 0..64. Iris's default specular texture is all zero, which would read as "non-porous": only trust
+	// the channel when the texture carries any data.
+	else if (dot(specularTex, specularTex) > 0.0) s.porosity = b / 64.0;
 
 	float a = specularTex.a * 255.0;
 	if (a < 254.5) s.emission = max(s.emission, a / 254.0);

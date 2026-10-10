@@ -35,6 +35,14 @@ the cherry-grove view, water, a cave with a torch, the Nether. Pair each with a 
 10. TAA (build after 0.3.0): block edges and leaves smooth and stable when still; turning the camera does not smear;
     the held item has no trail; teleport (`/tp ~100 ~ ~`) and Nether portal show no flash of old frames; note the FPS
     with Anti-Aliasing > Temporal Anti-Aliasing on and off.
+11. Clouds (M3): clear sky shows scattered 3D clouds with bright tops and grey bases; their shadows move over the
+    ground; `/weather rain` thickens them over ~1 min, `/weather thunder` darkens them; lightning flashes light sky,
+    clouds and ground. Note FPS with Clouds = Catalyst vs Vanilla (cost scales with the profile).
+12. Wetness (M3): in rain, open ground darkens and shines, puddles appear on flat ground after a while and dry
+    slowly after `/weather clear`; covered areas stay dry; deserts never get wet.
+13. Snow (M3): in a snowy biome during snowfall, block tops whiten unevenly over ~1 min and melt slowly afterwards.
+14. Wind (M3): grass and leaves sway in gusts (stronger in rain); their shadows move with them; no gaps between
+    leaf blocks. Morning (`/time set 0`) shows thin mist in valleys, none on mountain tops.
 
 ## Safe resume
 Run `python tools/fetch_glslang.py` once, then `python tools/validate_shaderpack.py` (must PASS); continue from `CURRENT.md`.

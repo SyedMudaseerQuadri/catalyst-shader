@@ -34,6 +34,7 @@ struct Surface {
 	float roughness;    // GGX alpha ("linear roughness" in LabPBR terms), 0..1
 	vec3 f0;            // specular reflectance at normal incidence, linear; 0 = no specular
 	float metalness;    // 0 dielectric, 1 metal (no diffuse term)
+	float porosity;     // 0..1 (LabPBR), -1 = unknown (weather_surface.glsl uses a per-class default)
 	int materialClass;
 };
 
@@ -59,6 +60,7 @@ Surface makeSurface(vec3 albedoLinear, vec3 geoNormal, vec2 light, float ao, int
 	s.roughness = 1.0;
 	s.f0 = vec3(0.0);
 	s.metalness = 0.0;
+	s.porosity = -1.0;
 	s.materialClass = materialClass;
 	if (materialClass == MAT_FOLIAGE) {
 		// Cross-shaped plants: shade like the ground they grow from, with light passing through.

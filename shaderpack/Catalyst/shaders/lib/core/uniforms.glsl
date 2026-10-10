@@ -18,6 +18,7 @@ uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferPreviousModelView;  // previous frame (TAA reprojection)
 uniform mat4 gbufferPreviousProjection;
 uniform mat4 shadowModelView;
+uniform mat4 shadowModelViewInverse;
 uniform mat4 shadowProjection;
 uniform vec3 cameraPosition;
 uniform vec3 previousCameraPosition;   // same shifted origin as cameraPosition (Iris keeps their difference exact)
@@ -46,6 +47,12 @@ uniform vec3 fogColor;
 uniform ivec2 eyeBrightnessSmooth;
 uniform int isEyeInWater;
 uniform float eyeAltitude;
+uniform float cloudHeight;               // vanilla cloud altitude (environment attribute), blocks
+uniform vec4 lightningBoltPosition;      // xyz relative to the camera, w = 1 while a bolt exists
+
+// Custom uniforms defined in shaders.properties (Iris smooth(): fade times are 0.1 s units of half-life).
+uniform float weatherWetness;            // rain-biome rain, soaks in ~30 s half-life, dries ~120 s
+uniform float weatherSnowCover;          // snow-biome snowfall, builds ~60 s half-life, melts ~180 s
 
 // Player status effects (readability / vanilla behavior)
 uniform float blindness;

@@ -48,3 +48,15 @@ No reference-shader source code was used. `reference_shaders/` was not opened fo
 | History rejection | Salvi, "An Excursion in Temporal Supersampling" (GDC 2016), public | variance (mean +- sigma) neighborhood box | intersected with min/max box, YCoCg | algorithmic |
 | History clipping | Pedersen, "Temporal Reprojection Anti-Aliasing in INSIDE" (GDC 2016), public talk | clip toward box center instead of per-channel clamp | `taaClipToBox()`; no code used | conceptual |
 | Previous-frame data | Iris `MatrixUniforms` / `CameraUniforms` (LGPL-3.0, read for the interface contract only) | `gbufferPrevious*`, `previousCameraPosition`, origin shift keeps the camera delta exact | uniform declarations only | interface contract |
+
+## Recorded influences (M3 environment)
+
+| Subsystem | Source | Concept | Catalyst interpretation | Influence type |
+|---|---|---|---|---|
+| Hashing | Jarzynski & Olano, "Hash Functions for GPU Rendering" (JCGT 2020) | PCG integer hashes | `lib/core/noise.glsl` | algorithmic (published) |
+| Value noise | Perlin (2002), "Improving Noise" | quintic fade curve | value-noise interpolation | algorithmic |
+| Cloud rendering | Schneider & Vos, "The Real-Time Volumetric Cloudscapes of Horizon Zero Dawn" (SIGGRAPH 2015), public | coverage map x height profile, eroded by detail noise; short light march | own density/profile functions, no code | conceptual |
+| Cloud multiple scattering | Wrenninge, Kulla & Lundqvist, "Oz: The Great and Volumetric" (SIGGRAPH 2013 talk), public | attenuated optical-depth octaves approximate multiple scattering | one extra octave, max() combined | algorithmic |
+| Cloud phase | Henyey & Greenstein (1941) | two-lobe phase | forward + back lobe mix | algorithmic |
+| Volume integration | Hillaire, "Physically Based and Unified Volumetric Rendering in Frostbite" (SIGGRAPH 2015), public | energy-conserving per-step scattering integration | S * (1 - exp(-sigma dt)) | algorithmic |
+| Foliage anchoring | common public shader-pack practice, Iris `mc_midTexCoord` | top vs rooted vertex from the sprite center | own wind model | conceptual |

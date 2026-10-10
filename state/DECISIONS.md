@@ -90,3 +90,17 @@ Centralized invalidation in `lib/post/taa.glsl`: empty history, camera jump > 4 
 respawn), off-screen reprojection. The hand is not reprojected (it moves with the camera). Lines/outlines and the sky
 pass are not jittered. Debug views disable jitter. One user option, `TAA` (default on in every profile: the cost is
 one fullscreen pass with 14 texture reads per pixel).
+
+## D-014 — Coupled environment (M3)
+One weather state drives every subsystem through EnvState: `cloudCover` (preset + slider + rain/thunder),
+`surfaceWet` / `snowCover` (custom smoothed uniforms gated by biome precipitation: wet 30 s soak / 120 s dry,
+snow 60 s build / 180 s melt, so stages progress at different rates), `wind` (procedural gust envelope, the only
+APPROXIMATED input), `lightningFlash` (bolt presence, flickering, distance-attenuated).
+Clouds: ray-marched cumulus slab at the vanilla cloud altitude + 2D cirrus, rendered in deferred over sky and
+distant terrain, steps scaled by internal tier (10/14/20/28/40); cloud shadows sample the same coverage field;
+vanilla clouds only with Clouds = Vanilla. Drift is a constant velocity (a time-varying speed integrated over
+frameTimeCounter would make clouds jump); frameTimeCounter's hourly wrap causes one jump per hour (accepted).
+Surfaces: sky-light-gated exposure; porosity-based darkening, water film, progressive puddles; snow on upward
+faces with irregular coverage and moderate albedo. Foliage/leaves sway in the same wind in terrain and shadow passes.
+Mist: low valley mist around sunrise and on wet ground. Snow trails and seasons: DEFER (no persistent world-space
+history / no input).

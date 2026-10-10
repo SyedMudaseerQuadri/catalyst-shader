@@ -33,3 +33,21 @@
 | `MC_HAND_DEPTH` macro = `HandRenderer.DEPTH` = 0.125 (hand projection z scaled by 0.125) | `gl/shader/StandardMacros.java` l.104, `pathways/HandRenderer.java` l.39, 56 | VERIFIED (source) |
 | History persistence across frames for a never-cleared buffer read and written by one composite pass | `targets/BufferFlipper.java` (ping-pong) | source read; runtime UNVERIFIED |
 | No per-vertex velocity attribute: Iris vertex formats add only `mc_Entity`, `mc_midTexCoord`, `at_tangent`, `at_midBlock` | `vertices/IrisVertexFormats.java` l.29-45 (and no velocity/motion file in the 1166-entry source tree) | VERIFIED ABSENT (source) |
+
+## Addendum 2026-10-11 (M3) — environment inputs (same commit `0a1fcaae`)
+
+| Feature | Source file | Result |
+|---|---|---|
+| `biome_precipitation` (0 none, 1 rain, 2 snow, at the player position), `temperature`, `rainfall`, `biome`, `biome_category` (per tick) | `uniforms/BiomeUniforms.java` l.30-53 | VERIFIED (source) |
+| `wetness` = smoothed `rainStrength`; half-lives default 600 / 200 (0.1 s units) | `uniforms/CommonUniforms.java` l.181, `properties/PackDirectives.java` l.63-64 | VERIFIED (source) |
+| **Defect:** the `drynessHalflife` directive writes the *wetness* half-life | `properties/PackDirectives.java` l.283-284 | VERIFIED (source); Catalyst avoids the directive and uses custom uniforms |
+| Custom uniforms `uniform.<type>.<name> = <expr>` in shaders.properties; inputs = all non-dynamic uniforms (incl. biome) | `ShaderProperties.java` l.586-593, `IrisRenderingPipeline.java` l.297-299 | VERIFIED (source) |
+| `smooth(target, fadeUp, fadeDown)`, `if(bool, a, b)`, `==` on ints; fade values are half-lives in 0.1 s units | `parsing/IrisFunctions.java` l.444-640, `parsing/SmoothFloat.java` l.60-120 | VERIFIED (source) |
+| `thunderStrength` (per frame) | `uniforms/IrisExclusiveUniforms.java` l.62 | VERIFIED (source) |
+| `lightningBoltPosition` (xyz camera-relative, w = 1 while a bolt entity exists, per tick) | `uniforms/IrisExclusiveUniforms.java` l.91-102 | VERIFIED (source) |
+| `cloudHeight` (vanilla cloud altitude environment attribute, per frame) | `uniforms/IrisExclusiveUniforms.java` l.290-296 | VERIFIED (source) |
+| `shadowModelViewInverse` | `uniforms/MatrixUniforms.java` l.49-51 | VERIFIED (source) |
+| `mc_midTexCoord` vertex attribute (float x2) | `vertices/IrisVertexFormats.java` l.31, 43 | VERIFIED (source) |
+| `depthtex1` = depth copied before translucents (`beginTranslucents` -> `copyPreTranslucentDepth`) | `pipeline/IrisRenderingPipeline.java` l.1058-1069 | VERIFIED (source); used by M4 |
+| `shadowtex1` = shadow depth without translucents | `shadows/ShadowRenderTargets.java` l.66, 181; `shadows/ShadowRenderer.java` l.575-587 | VERIFIED (source); used by M4 |
+| Wind, season, snow-trail history: no input | none | UNAVAILABLE (wind APPROXIMATED procedurally; season and trails DEFER) |

@@ -6,15 +6,20 @@
 //
 // Input classification for the pinned target (Minecraft 1.21.11 / Iris 1.10.7):
 //   time of day, sun/moon angle, rain, thunder, wetness, dimension (compile-time), eye light: VERIFIED uniforms
-//   cloud coverage: DERIVABLE (from rain/thunder)      wind: APPROXIMATED later (M3)
-//   biome: UNAVAILABLE as a direct input here (vanilla skyColor/fogColor carry biome tint)
+//   cloud coverage: DERIVABLE (preset + rain/thunder)   wind: APPROXIMATED (lib/environment/wind.glsl)
+//   biome precipitation (none/rain/snow): VERIFIED (`biome_precipitation`, smoothed into weatherWetness /
+//     weatherSnowCover custom uniforms in shaders.properties); biome colors via vanilla skyColor/fogColor
+//   lightning: VERIFIED (`lightningBoltPosition`)
 //   season: UNAVAILABLE in vanilla
 //
 // Units: scene-linear relative radiance (see lib/core/common.glsl). Directions are player space, unit length.
-// Requires: settings.glsl, core/common.glsl, core/uniforms.glsl.
+// Requires: settings.glsl, core/common.glsl, core/uniforms.glsl, core/noise.glsl, environment/wind.glsl.
 
 #if !defined CATALYST_ENV_STATE
 #define CATALYST_ENV_STATE
+
+#include "/lib/core/noise.glsl"
+#include "/lib/environment/wind.glsl"
 
 struct EnvState {
 	vec3 sunDir;          // toward the sun
@@ -27,7 +32,13 @@ struct EnvState {
 	float rain;           // 0..1
 	float storm;          // 0..1 thunder
 	float wetness;        // 0..1, lags rain (drying)
-	float overcast;       // 0..1 derived cloud cover
+	float overcast;       // 0..1 weather overcast (rain/thunder): flattens sky, attenuates the direct beam
+	float cloudCover;     // 0..1 coverage of the volumetric cloud layer (clear-weather clouds included)
+	float surfaceWet;     // 0..1 how wet exposed surfaces are (rain biomes; lags rain, dries slowly)
+	float snowCover;      // 0..1 snow accumulation on exposed upward surfaces (snow biomes)
+	float wind;           // 0..~1.6 current wind strength (lib/environment/wind.glsl)
+	float lightningFlash; // 0..1 sky-wide flash from a lightning bolt (flickers while the bolt exists)
+	vec3 lightningPos;    // bolt position, player space
 	float eyeSky;         // 0..1 smoothed sky light at the eye
 	float eyeBlock;       // 0..1 smoothed block light at the eye
 	vec3 sunRadiance;     // direct sunlight after atmospheric transmittance
@@ -86,6 +97,14 @@ EnvState getEnvState() {
 	env.storm   = thunderStrength;
 	env.wetness = wetness;
 	env.overcast = saturate(rainStrength * 0.85 + thunderStrength * 0.15);
+	env.cloudCover = saturate(PRESET_CLOUD_COVERAGE * CLOUD_COVERAGE + 0.50 * rainStrength + 0.15 * thunderStrength);
+	env.surfaceWet = saturate(weatherWetness) * WEATHER_WETNESS;
+	env.snowCover = saturate(weatherSnowCover) * SNOW_ACCUMULATION;
+	env.wind = windStrength();
+	// Lightning: abrupt by nature, but flickering (several return strokes) rather than one flat flash.
+	float flicker = 0.55 + 0.45 * hash11(frameCounter / 3);
+	env.lightningPos = lightningBoltPosition.xyz;
+	env.lightningFlash = lightningBoltPosition.w * flicker * (1.0 / (1.0 + sqr(length(lightningBoltPosition.xz) / 400.0)));
 
 	env.eyeSky   = float(eyeBrightnessSmooth.y) / 240.0;
 	env.eyeBlock = float(eyeBrightnessSmooth.x) / 240.0;
@@ -106,6 +125,7 @@ EnvState getEnvState() {
 	env.skyAmbient = mix(vec3(0.20, 0.09, 0.05), vanillaFogLinear() * 1.5, 0.5) * 0.35 * AMBIENT_INTENSITY;
 	env.day = 0.0; env.night = 0.0; env.twilight = 0.0;
 	env.rain = 0.0; env.storm = 0.0; env.wetness = 0.0; env.overcast = 0.0;
+	env.cloudCover = 0.0; env.surfaceWet = 0.0; env.snowCover = 0.0; env.lightningFlash = 0.0;
 #elif defined DIM_END
 	env.sunRadiance = vec3(0.0);
 	env.moonRadiance = vec3(0.0);
@@ -113,6 +133,7 @@ EnvState getEnvState() {
 	env.skyAmbient = vec3(0.16, 0.12, 0.22) * 0.45 * AMBIENT_INTENSITY;
 	env.day = 0.0; env.night = 0.0; env.twilight = 0.0;
 	env.rain = 0.0; env.storm = 0.0; env.wetness = 0.0; env.overcast = 0.0;
+	env.cloudCover = 0.0; env.surfaceWet = 0.0; env.snowCover = 0.0; env.lightningFlash = 0.0;
 #else
 	float aerosol = PRESET_AEROSOL * (1.0 + 2.0 * env.rain);
 

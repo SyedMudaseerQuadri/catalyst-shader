@@ -24,6 +24,7 @@ screen.LIGHTING=Lighting
 screen.SHADOWS_SCREEN=Shadows
 screen.MATERIALS=Materials
 screen.ATMOSPHERE=Atmosphere
+screen.WEATHER=Weather & Wind
 screen.COLOR=Color & Exposure
 screen.IMAGE=Anti-Aliasing
 screen.DEBUG=Debug
@@ -67,6 +68,23 @@ option.SPECULAR_INTENSITY.comment=Strength of shine and sky reflections on surfa
 # ---- Atmosphere
 option.FOG_DENSITY=Fog Density
 option.FOG_DENSITY.comment=Distance haze, relative to the visual style. Rain always adds more.
+option.CLOUD_STYLE=Clouds
+option.CLOUD_STYLE.comment=Catalyst clouds are volumetric, cast shadows and follow the weather. Costs more on lower profiles.
+value.CLOUD_STYLE.0=Off
+value.CLOUD_STYLE.1=Vanilla
+value.CLOUD_STYLE.2=Catalyst
+option.CLOUD_COVERAGE=Cloud Amount
+option.CLOUD_COVERAGE.comment=How cloudy clear weather is. Rain and storms always add more.
+option.CLOUD_SHADOW_STRENGTH=Cloud Shadows
+option.CLOUD_SHADOW_STRENGTH.comment=How dark the shadows of passing clouds are (Catalyst clouds only).
+
+# ---- Weather
+option.WEATHER_WETNESS=Rain Wetness
+option.WEATHER_WETNESS.comment=Surfaces darken and shine after rain, then dry slowly. Puddles form on flat ground.
+option.SNOW_ACCUMULATION=Snow Cover
+option.SNOW_ACCUMULATION.comment=Snow settles on the tops of blocks while it snows, and melts away slowly afterwards.
+option.FOLIAGE_MOTION=Foliage Motion
+option.FOLIAGE_MOTION.comment=Grass, plants and leaves sway in gusty wind. Stronger in rain and storms. 0 = still.
 
 # ---- Color
 option.EXPOSURE_BIAS=Exposure

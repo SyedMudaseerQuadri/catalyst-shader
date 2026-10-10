@@ -68,6 +68,9 @@ void main() {
 	EnvState env = getEnvState();
 
 	#if defined PROGRAM_CLOUDS
+		#if CLOUD_STYLE != 1
+		discard; // Catalyst volumetric clouds (deferred) or clouds off
+		#endif
 		vec3 n = dot(geoNormal, geoNormal) > 1e-6 ? normalize(geoNormal) : vec3(0.0, 1.0, 0.0);
 		// Clouds are thick scattering media: soft wrapped direct light, sky ambient, and light scattered in from
 		// the sky dome above. The sky term keeps clouds from ever being darker than the sky behind them
@@ -77,7 +80,8 @@ void main() {
 		vec3 lit = env.lightRadiance * wrapped * 0.7 + env.skyAmbient + skyAbove * 0.6 + vec3(0.004);
 		outColor = vec4(albedo * lit, c.a);
 	#elif defined PROGRAM_WEATHER
-		vec3 lit = env.skyAmbient * 1.2 + env.lightRadiance * 0.15 + blockLightTint(env.blockLightColor, lightLevels.x) * pow(lightLevels.x, 4.0);
+		vec3 lit = env.skyAmbient * 1.2 + env.lightRadiance * 0.15 + blockLightTint(env.blockLightColor, lightLevels.x) * pow(lightLevels.x, 4.0)
+		         + vec3(0.75, 0.82, 1.00) * env.lightningFlash * 1.5;
 		outColor = vec4(albedo * lit, c.a * 0.7);
 	#else
 		outColor = vec4(albedo * UNLIT_RADIANCE, c.a);

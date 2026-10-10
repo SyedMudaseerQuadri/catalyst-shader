@@ -36,6 +36,17 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define SPECULAR_INTENSITY 1.00 // [0.00 0.25 0.50 0.75 1.00 1.25 1.50]
 
 // ---------------------------------------------------------------------------------------------
+// Clouds and weather (M3). Coverage, wetness and snow are multipliers over the visual preset / weather state.
+// Cloud style: 0 off, 1 vanilla, 2 Catalyst volumetric (cost scales with the performance profile).
+#define CLOUD_STYLE 2 // [0 1 2]
+#define CLOUD_COVERAGE 1.00 // [0.25 0.50 0.75 1.00 1.25 1.50 2.00]
+#define CLOUD_SHADOW_STRENGTH 0.80 // [0.00 0.25 0.50 0.65 0.80 1.00]
+#define WEATHER_WETNESS 1.00 // [0.00 0.50 0.75 1.00 1.25]
+#define SNOW_ACCUMULATION 1.00 // [0.00 0.50 1.00 1.50]
+// Wind sway of grass, plants and leaves. 0 = static.
+#define FOLIAGE_MOTION 1.00 // [0.00 0.50 1.00 1.50 2.00]
+
+// ---------------------------------------------------------------------------------------------
 // Anti-aliasing: temporal (jittered geometry + reprojected history, lib/post/taa.glsl). Smooths jagged
 // edges and shimmering foliage/shadows; cheap on every profile.
 #define TAA
@@ -65,6 +76,7 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 // =============================================================================================
 #if VISUAL_PRESET == 0
 	// Vanilla Enhanced — closest to Minecraft identity.
+	const float PRESET_CLOUD_COVERAGE     = 0.40; // clear-weather cumulus coverage
 	const float PRESET_VANILLA_SKY_BLEND   = 0.60; // weight of the biome's vanilla sky color in ambient light
 	const float PRESET_SKY_DOME_VANILLA    = 0.80; // weight of the biome's vanilla sky color in the visible sky
 	const float PRESET_AEROSOL            = 0.06; // haze optical depth; warms low sun
@@ -76,6 +88,7 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 	const float PRESET_SHADOW_AMBIENT     = 1.10; // ambient share in shade; >1 = softer contrast
 #elif VISUAL_PRESET == 2
 	// Cinematic — stronger atmosphere and contrast, still readable.
+	const float PRESET_CLOUD_COVERAGE     = 0.50; // clear-weather cumulus coverage
 	const float PRESET_VANILLA_SKY_BLEND   = 0.20;
 	const float PRESET_SKY_DOME_VANILLA    = 0.45;
 	const float PRESET_AEROSOL            = 0.11;
@@ -87,6 +100,7 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 	const float PRESET_SHADOW_AMBIENT     = 0.85;
 #else
 	// Natural / Realistic — default target (~60% natural / 40% cinematic).
+	const float PRESET_CLOUD_COVERAGE     = 0.45; // clear-weather cumulus coverage
 	const float PRESET_VANILLA_SKY_BLEND   = 0.35;
 	const float PRESET_SKY_DOME_VANILLA    = 0.60;
 	const float PRESET_AEROSOL            = 0.08;
