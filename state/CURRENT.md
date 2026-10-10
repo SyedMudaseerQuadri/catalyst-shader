@@ -2,7 +2,7 @@
 
 **Milestone:** M2 — Lighting, Materials, Shadows & Temporal Foundation (M1 implemented, awaiting in-game check)
 **Status:** IN PROGRESS. Second in-game test done (EV-005): debug views and shadows pass; tone/color reworked in 0.3.0 (I-005, I-008), untested.
-**Current objective:** Temporal foundation: jittered TAA with history invalidation implemented (D-013), compile PASS, in-game UNVERIFIED. Per-object motion vectors not started.
+**Current objective:** Temporal foundation: jittered TAA with history invalidation implemented (D-013), compile PASS, in-game UNVERIFIED. Per-object motion vectors impossible on Iris 1.10.7; entity-trail rejection used instead (D-013). M2 code-complete pending in-game check.
 
 **What exists:** `shaderpack/Catalyst/` (Iris pack, 3 dimensions, LabPBR materials), `tools/validate_shaderpack.py`,
 `tools/fetch_glslang.py` (pinned compiler), `tools/tone_sim.py` (tone/color simulator), `tools/package_shaderpack.py`. Build: `dist/Catalyst-0.3.0.zip`, also attached to the GitHub Release `v0.3.0`.

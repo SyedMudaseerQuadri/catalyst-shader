@@ -6,6 +6,7 @@
 #include "/lib/core/uniforms.glsl"
 #include "/lib/core/space.glsl"
 #include "/lib/core/buffers.glsl"
+#include "/lib/material/classify.glsl"
 
 // =============================================================================================
 #if defined STAGE_VERTEX
@@ -24,6 +25,7 @@ void main() {
 #include "/lib/post/taa.glsl"
 
 uniform sampler2D colortex0;
+uniform sampler2D colortex3;
 uniform sampler2D colortex4;
 uniform sampler2D depthtex0;
 
@@ -40,6 +42,12 @@ const float TAA_CURRENT_WEIGHT_MOTION = 0.25;
 const float TAA_CURRENT_WEIGHT_HAND   = 0.25;
 // Hand pixels: Iris scales the hand's projected depth by MC_HAND_DEPTH around the screen-depth center.
 const float TAA_HAND_DEPTH_LIMIT = 0.5 + 0.5 * MC_HAND_DEPTH;
+// History alpha: 1 = scene, TAA_HISTORY_ENTITY = entity (mob, item, block entity, particle), 0 = no history.
+const float TAA_HISTORY_ENTITY = 0.75;
+
+bool isEntityPixel(ivec2 pixel) {
+	return int(texelFetch(colortex3, pixel, 0).r * 255.0 + 0.5) >= MAT_ENTITY;
+}
 
 // Screen position of the same surface point in the previous frame.
 vec2 reprojectToPreviousFrame(vec2 screenUv, float depth) {
@@ -67,14 +75,16 @@ void main() {
 	vec2 unjitteredUv = uv - taaJitterPixels() * texel;
 	vec2 previousUv = isHand ? uv : reprojectToPreviousFrame(unjitteredUv, depth);
 
-	vec4 historySample = texture(colortex4, previousUv);
-	bool valid = historySample.a > 0.5
+	// Point fetch: the alpha flags must not be blended between neighbors.
+	float historyFlag = texelFetch(colortex4, ivec2(clamp(previousUv * texSize, vec2(0.0), texSize - 1.0)), 0).a;
+	bool valid = historyFlag > 0.5
 	          && all(greaterThanEqual(previousUv, vec2(0.0))) && all(lessThanEqual(previousUv, vec2(1.0)))
 	          && distance(cameraPosition, previousCameraPosition) < TAA_RESET_DISTANCE;
 
 	vec3 resolved = current;
 	if (valid) {
 		// Current 3x3 neighborhood: mean +- 1 standard deviation, intersected with its min/max box.
+		bool entityNearby = false;
 		vec3 m1 = vec3(0.0);
 		vec3 m2 = vec3(0.0);
 		vec3 boxMin = vec3(1e9);
@@ -86,6 +96,7 @@ void main() {
 				m2 += c * c;
 				boxMin = min(boxMin, c);
 				boxMax = max(boxMax, c);
+				entityNearby = entityNearby || isEntityPixel(ivec2(gl_FragCoord.xy) + ivec2(x, y));
 			}
 		}
 		m1 /= 9.0;
@@ -98,6 +109,10 @@ void main() {
 		float motionPixels = length((previousUv - uv) * texSize);
 		float currentWeight = isHand ? TAA_CURRENT_WEIGHT_HAND
 		                             : mix(TAA_CURRENT_WEIGHT_STILL, TAA_CURRENT_WEIGHT_MOTION, saturate(motionPixels / 8.0));
+		// No per-object motion vectors exist in Iris 1.10.7 (D-013), so a moving mob's old position survives in history
+		// as a trail. History that was an entity where no entity is near now is that trail: drop most of it.
+		// (Static block entities keep entity pixels in the neighborhood, so their edges are unaffected.)
+		if (historyFlag < 0.95 && !entityNearby) currentWeight = max(currentWeight, 0.80);
 		resolved = taaDecode(mix(history, taaEncode(current), currentWeight));
 	}
 
@@ -105,7 +120,7 @@ void main() {
 	if (any(isnan(resolved)) || any(isinf(resolved))) resolved = current;
 
 	outColor = vec4(resolved, 1.0);
-	outHistory = vec4(resolved, 1.0);
+	outHistory = vec4(resolved, isEntityPixel(ivec2(gl_FragCoord.xy)) ? TAA_HISTORY_ENTITY : 1.0);
 }
 
 #endif

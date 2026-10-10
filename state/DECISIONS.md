@@ -82,8 +82,10 @@ as it dims; multi-bounce strength 0.35; (5) clouds include sky in-scatter so the
 
 ## D-013 — Temporal anti-aliasing design (M2 temporal foundation)
 Jittered TAA in a dedicated composite1 pass on the fogged HDR scene, before exposure/tonemap (so exposure changes
-never smear through history). Camera-only reprojection from depth (no per-object motion vectors yet: entities rely on
-neighborhood clipping; ghosting on fast mobs is a known limitation). History in colortex4 (RGBA16F, never cleared).
+never smear through history). Camera-only reprojection from depth. Per-object motion vectors are not possible: Iris 1.10.7's vertex formats have no
+velocity attribute (checked `vertices/IrisVertexFormats.java`: only mc_Entity, mc_midTexCoord, at_tangent, at_midBlock).
+Mitigation: history alpha marks entity pixels; history that was an entity where no entity is in the current 3x3
+neighborhood is mostly discarded (trail removal). Static block entities keep entity neighbors, so their edges stay AA'd. History in colortex4 (RGBA16F, never cleared).
 Centralized invalidation in `lib/post/taa.glsl`: empty history, camera jump > 4 blocks/frame (teleport, portal,
 respawn), off-screen reprojection. The hand is not reprojected (it moves with the camera). Lines/outlines and the sky
 pass are not jittered. Debug views disable jitter. One user option, `TAA` (default on in every profile: the cost is

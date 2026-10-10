@@ -8,7 +8,8 @@
 //   - the history buffer holds no data (alpha 0: first frame, resolution change, new dimension pipeline),
 //   - the camera moved more than TAA_RESET_DISTANCE blocks in one frame (teleport, respawn, portal),
 //   - the reprojected position is off-screen (newly revealed screen edge).
-// Moving entities have no motion vectors yet; neighborhood clipping limits their ghosting.
+// Moving entities have no motion vectors (Iris 1.10.7 has no velocity attribute): the history marks entity pixels
+// and the resolve drops history that was an entity where none is near now (trail removal), plus neighborhood clipping.
 // Requires lib/settings.glsl, lib/core/common.glsl, lib/core/uniforms.glsl.
 
 #if !defined CATALYST_TAA

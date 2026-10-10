@@ -32,3 +32,4 @@
 | `colortexNClear = false` keeps a buffer out of the per-frame clear list | `shaderpack/properties/PackRenderTargetDirectives.java` l.55-64, 116 | VERIFIED (source) |
 | `MC_HAND_DEPTH` macro = `HandRenderer.DEPTH` = 0.125 (hand projection z scaled by 0.125) | `gl/shader/StandardMacros.java` l.104, `pathways/HandRenderer.java` l.39, 56 | VERIFIED (source) |
 | History persistence across frames for a never-cleared buffer read and written by one composite pass | `targets/BufferFlipper.java` (ping-pong) | source read; runtime UNVERIFIED |
+| No per-vertex velocity attribute: Iris vertex formats add only `mc_Entity`, `mc_midTexCoord`, `at_tangent`, `at_midBlock` | `vertices/IrisVertexFormats.java` l.29-45 (and no velocity/motion file in the 1166-entry source tree) | VERIFIED ABSENT (source) |
