@@ -10,5 +10,5 @@
 | M5 | Image quality, exposure, screen-space GI (internal Low/Medium/High tiers), reflections/post | IMPLEMENTED (D-016), compile PASS, in-game UNVERIFIED: SSGI + AO, glossy SSR, volumetric sunlight, bloom, preset-distinct grading. DEFER: DOF, motion blur |
 | M6 | Voxel GI infrastructure (internal Ultra/Extreme tiers, additive to M5) | DEFERRED UNTIL EVIDENCE (gate needs measured frame times; Ultra/Extreme run SSGI with more rays meanwhile) |
 | M7 | Advanced ray/path transport experiments | DEFERRED UNTIL EVIDENCE |
-| M8 | Integration, presets, scalability, optimization | FOUNDATION: 5 performance profiles + 3 visual presets wired; nothing measured |
+| M8 | Integration, presets, scalability, optimization | PARTIAL: profiles scale every new pass by internal tier; static cost model + option dependencies documented (gpu_budget.md). Gate needs benchmarks (UNMEASURED) |
 | M9 | Full QA, compatibility validation, release packaging | FOUNDATION: `tools/validate_shaderpack.py`, `tools/package_shaderpack.py`, `tools/fetch_glslang.py` (pinned compiler) |

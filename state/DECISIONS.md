@@ -119,7 +119,8 @@ take opaque shadows from shadowtex1 and get water depth = shadowtex0/shadowtex1 
 absorbed sunlight, attenuated sky light and caustics (normalized to mean 1, Monte Carlo fit). Stained glass/ice now
 cast colored shadows (shadowcolor0 rgb) instead of black ones. Underwater view: sun shafts marched through the
 shadow maps (`UNDERWATER_SHAFTS`). After surfacing: droplets running down the view (`VIEW_DROPLETS`, ~3 s).
-Limitations: entities and particles behind water are covered by the opaque water write if drawn before it;
+Limitations: Iris runs deferred after entities, so mobs under water are in colortex5 and show through it; only
+translucent things drawn before the water (rare) are covered by its opaque write;
 shoreline sand is not darkened (no water-proximity data in opaque passes); the underwater-light effects need Shadows.
 
 ## D-016 — Image quality and indirect light (M5)
