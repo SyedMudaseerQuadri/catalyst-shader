@@ -266,6 +266,7 @@ def main() -> int:
         configs["SHADOWS=off"] = {"SHADOWS": "false"}
         configs["MATERIAL_MAPS=off"] = {"MATERIAL_MAPS": "false"}
         configs["TAA=off"] = {"TAA": "false"}
+        configs["water-features=off"] = {"WATER_REFLECTIONS": "false", "UNDERWATER_SHAFTS": "false", "VIEW_DROPLETS": "false"}
         for v in options["CLOUD_STYLE"]["values"]:
             configs[f"CLOUD_STYLE={v}"] = {"CLOUD_STYLE": v}
 

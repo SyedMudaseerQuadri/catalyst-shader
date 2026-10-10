@@ -1,4 +1,5 @@
-// Catalyst — composite pass: atmospheric / medium fog over the finished HDR scene (opaque + translucent).
+// Catalyst — composite pass: atmospheric / medium fog over the finished HDR scene (opaque + translucent),
+// plus underwater light shafts when the eye is in water.
 
 #include "/lib/settings.glsl"
 #include "/lib/core/common.glsl"
@@ -20,9 +21,22 @@ void main() {
 // =============================================================================================
 #if defined STAGE_FRAGMENT
 
+// Shafts read the shadow maps; UNDERWATER_SHAFTS is a user option (Iris needs #ifdef to list it).
+#ifdef UNDERWATER_SHAFTS
+	#ifdef SHADOWS
+		#if defined DIM_OVERWORLD
+			#define SHADOW_RECEIVER
+		#endif
+	#endif
+#endif
+
 #include "/lib/environment/state.glsl"
+#include "/lib/shadow/shadows.glsl"
 #include "/lib/atmosphere/sky.glsl"
 #include "/lib/atmosphere/fog.glsl"
+#include "/lib/atmosphere/clouds.glsl"
+#include "/lib/environment/water.glsl"
+#include "/lib/atmosphere/underwater.glsl"
 
 uniform sampler2D colortex0;
 uniform sampler2D depthtex0;
@@ -46,6 +60,12 @@ void main() {
 
 	EnvState env = getEnvState();
 	color = applyAtmosphericFog(color, playerPos, isSky, env);
+#if defined SHADOW_RECEIVER
+	if (isEyeInWater == 1) {
+		float dither = interleavedGradientNoise(gl_FragCoord.xy + 5.588238 * float(frameCounter % 64));
+		color += underwaterShafts(playerPos, env, dither);
+	}
+#endif
 
 	outColor = vec4(color, 1.0);
 }

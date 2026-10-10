@@ -104,3 +104,20 @@ Surfaces: sky-light-gated exposure; porosity-based darkening, water film, progre
 faces with irregular coverage and moderate albedo. Foliage/leaves sway in the same wind in terrain and shadow passes.
 Mist: low valley mist around sunrise and on wet ground. Snow trails and seasons: DEFER (no persistent world-space
 history / no input).
+
+## D-015 — Water and underwater (M4)
+Water is composited by gbuffers_water itself and written opaque: deferred copies the opaque HDR scene (sky, clouds,
+terrain) into colortex5 (R11F_G11F_B10F); the water shader refracts it by the wave tilt, absorbs/scatters along the
+real path through the water (depthtex1, the pre-translucent depth Iris provides), and mixes a Fresnel reflection:
+screen-space reflection of terrain (`WATER_REFLECTIONS`, steps by tier) over an environment reflection of sky +
+approximate clouds. Optics: clear-water absorption (0.34, 0.07, 0.03)/block + bluish scattering; the biome water
+tint (vertex color) raises absorption/scattering for murky water. Waves: fragment normals from a wind-aligned
+height field (amplitude from wind/weather), never vertex displacement; rain ring ripples on water and puddles.
+From below: Snell's window with total internal reflection. Shoreline foam where the water is thin.
+Light under water: water is now a shadow caster in shadowtex0 only, flagged in shadowcolor0 (a = 0.5); receivers
+take opaque shadows from shadowtex1 and get water depth = shadowtex0/shadowtex1 depth difference in blocks, giving
+absorbed sunlight, attenuated sky light and caustics (normalized to mean 1, Monte Carlo fit). Stained glass/ice now
+cast colored shadows (shadowcolor0 rgb) instead of black ones. Underwater view: sun shafts marched through the
+shadow maps (`UNDERWATER_SHAFTS`). After surfacing: droplets running down the view (`VIEW_DROPLETS`, ~3 s).
+Limitations: entities and particles behind water are covered by the opaque water write if drawn before it;
+shoreline sand is not darkened (no water-proximity data in opaque passes); the underwater-light effects need Shadows.

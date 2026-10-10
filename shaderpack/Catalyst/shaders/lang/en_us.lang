@@ -25,6 +25,7 @@ screen.SHADOWS_SCREEN=Shadows
 screen.MATERIALS=Materials
 screen.ATMOSPHERE=Atmosphere
 screen.WEATHER=Weather & Wind
+screen.WATER=Water
 screen.COLOR=Color & Exposure
 screen.IMAGE=Anti-Aliasing
 screen.DEBUG=Debug
@@ -85,6 +86,20 @@ option.SNOW_ACCUMULATION=Snow Cover
 option.SNOW_ACCUMULATION.comment=Snow settles on the tops of blocks while it snows, and melts away slowly afterwards.
 option.FOLIAGE_MOTION=Foliage Motion
 option.FOLIAGE_MOTION.comment=Grass, plants and leaves sway in gusty wind. Stronger in rain and storms. 0 = still.
+
+# ---- Water
+option.WATER_WAVE_STRENGTH=Waves
+option.WATER_WAVE_STRENGTH.comment=Wave size. Waves already grow with wind, rain and storms. 0 = mirror-calm.
+option.WATER_TURBIDITY=Water Murkiness
+option.WATER_TURBIDITY.comment=How quickly water absorbs light with depth. Swamps are always murkier than oceans.
+option.CAUSTICS_STRENGTH=Caustics
+option.CAUSTICS_STRENGTH.comment=Rippling light patterns on surfaces under water (needs Shadows).
+option.WATER_REFLECTIONS=Terrain Reflections
+option.WATER_REFLECTIONS.comment=Water reflects terrain on screen. Off: only sky and clouds are reflected (faster).
+option.UNDERWATER_SHAFTS=Underwater Light Shafts
+option.UNDERWATER_SHAFTS.comment=Sunbeams in the water when you dive (needs Shadows).
+option.VIEW_DROPLETS=Water Droplets
+option.VIEW_DROPLETS.comment=Water runs down the view for a few seconds after you surface.
 
 # ---- Color
 option.EXPOSURE_BIAS=Exposure

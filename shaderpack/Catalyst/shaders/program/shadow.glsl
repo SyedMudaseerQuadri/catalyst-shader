@@ -16,13 +16,14 @@ in vec4 mc_Entity;
 in vec2 mc_midTexCoord;
 
 out vec2 texcoord;
-flat out int skipCaster;
+out vec4 vertexColor;
+flat out int isWater;
 
 void main() {
 	texcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
-	// Water does not cast sun shadows (it transmits light; caustics/underwater light are M4).
-	int materialClass = materialFromBlockId(int(mc_Entity.x + 0.5));
-	skipCaster = materialClass == MAT_WATER ? 1 : 0;
+		int materialClass = materialFromBlockId(int(mc_Entity.x + 0.5));
+	isWater = materialClass == MAT_WATER ? 1 : 0;
+	vertexColor = gl_Color;
 
 	vec4 clip = ftransform(); // in the shadow pass this is shadowProjection * shadowModelView * vertex
 	if (materialClass == MAT_FOLIAGE || materialClass == MAT_LEAVES) {
@@ -42,16 +43,26 @@ void main() {
 uniform sampler2D gtexture;
 
 in vec2 texcoord;
-flat in int skipCaster;
+in vec4 vertexColor;
+flat in int isWater;
+
+const float SHADOW_WATER_FLAG_OUT = 0.5; // must match SHADOW_WATER_FLAG in lib/shadow/shadows.glsl
 
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 outShadowColor;
 
 void main() {
-	if (skipCaster == 1) discard;
-	float alpha = texture(gtexture, texcoord).a;
-	if (alpha < 0.1) discard;
-	outShadowColor = vec4(1.0);
+	// Water is a caster in shadowtex0 only (receivers use shadowtex1 for opaque shadows); it marks itself so
+	// receivers below can apply water absorption and caustics (lib/shadow/shadows.glsl).
+	if (isWater == 1) {
+		outShadowColor = vec4(1.0, 1.0, 1.0, SHADOW_WATER_FLAG_OUT);
+		return;
+	}
+	vec4 texel = texture(gtexture, texcoord) * vertexColor;
+	if (texel.a < 0.1) discard;
+	// Opaque and cutout casters: no tint. Translucent (stained glass, ice): light keeps their color.
+	vec3 transmittance = texel.a > 0.99 ? vec3(1.0) : mix(vec3(1.0), srgbToLinear(texel.rgb), saturate(texel.a * 1.2));
+	outShadowColor = vec4(transmittance, 1.0);
 }
 
 #endif

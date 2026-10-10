@@ -7,7 +7,7 @@
 // wetness rises (the noise threshold falls with wetness: damp -> wet -> puddles), so the stages are progressive.
 // Snow settles on upward faces with irregular coverage (lighter on plants), keeps a moderate albedo (never a
 // glowing field), and melts slowly because weatherSnowCover fades slowly (shaders.properties).
-// Requires: core/common.glsl, core/noise.glsl, material/classify.glsl, environment/state.glsl.
+// Requires: core/common.glsl, core/noise.glsl, material/classify.glsl, environment/state.glsl, environment/water.glsl.
 
 #if !defined CATALYST_WEATHER_SURFACE
 #define CATALYST_WEATHER_SURFACE
@@ -78,7 +78,9 @@ float applyWeatherToSurface(inout Surface s, vec3 worldPos, EnvState env) {
 		s.albedo *= 1.0 - 0.35 * puddle;
 		s.roughness = mix(s.roughness, 0.015, puddle);
 		s.f0 = max(s.f0, vec3(WATER_FILM_F0 * puddle));
-		s.normal = normalize(mix(s.normal, s.geoNormal, puddle));
+		// Standing water: flat, with rain ripples while it rains.
+		vec2 ripple = rainRippleGradient(worldPos.xz, frameTimeCounter, rainStrength * exposure);
+		s.normal = normalize(mix(s.normal, normalize(vec3(-ripple.x, 1.0, -ripple.y)), puddle));
 	}
 	return puddle;
 }

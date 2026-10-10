@@ -7,6 +7,7 @@ const int colortex1Format = RGBA16;
 const int colortex2Format = RGBA8;
 const int colortex3Format = RGBA8;
 const int colortex4Format = RGBA16F;
+const int colortex5Format = R11F_G11F_B10F;
 */
 //
 // Data buffers (1-3) always receive alpha = 1 from their producers. Under vanilla SRC_ALPHA blending
@@ -30,5 +31,9 @@ const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 // colortex4: TAA history (resolved HDR scene of the previous frame), a = 1 once written. Never cleared:
 // it must survive into the next frame. Written only by composite1 (program/taa.glsl).
 const bool colortex4Clear = false;
+// colortex5: copy of the opaque HDR scene (sky + clouds + opaque geometry) made in deferred, read by gbuffers_water for
+// refraction and screen-space reflections (a buffer cannot be read while it is being drawn to). Fully rewritten
+// every frame, so it is not cleared.
+const bool colortex5Clear = false;
 
 #endif

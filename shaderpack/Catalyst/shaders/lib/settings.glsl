@@ -25,7 +25,15 @@ const int shadowMapResolution = 2048; // [1024 1536 2048 3072 4096]
 const float shadowDistance = 128.0; // [64.0 80.0 96.0 128.0 160.0 192.0 256.0]
 // Only render shadow-casting chunks inside shadowDistance: a large saving on the RTX 3050 floor.
 const float shadowDistanceRenderMul = 1.0;
-const bool shadowHardwareFiltering = true;
+// shadowtex1 (opaque casters) uses hardware depth comparison for PCF; shadowtex0 (incl. water/glass) is read raw
+// to find translucent casters above a receiver (lib/shadow/shadows.glsl).
+const bool shadowHardwareFiltering0 = false;
+const bool shadowHardwareFiltering1 = true;
+/*
+const int shadowcolor0Format = RGBA8;
+*/
+const bool shadowcolor0Clear = true;
+const vec4 shadowcolor0ClearColor = vec4(1.0, 1.0, 1.0, 1.0);
 #define SHADOW_FILTER 2 // [0 1 2 3]
 #define SHADOW_SOFTNESS 1.00 // [0.50 0.75 1.00 1.25 1.50 2.00]
 const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 30.0 40.0]
@@ -45,6 +53,18 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define SNOW_ACCUMULATION 1.00 // [0.00 0.50 1.00 1.50]
 // Wind sway of grass, plants and leaves. 0 = static.
 #define FOLIAGE_MOTION 1.00 // [0.00 0.50 1.00 1.50 2.00]
+
+// ---------------------------------------------------------------------------------------------
+// Water (M4). Wave strength multiplies the wind/weather-driven waves; turbidity multiplies absorption and scattering.
+#define WATER_WAVE_STRENGTH 1.00 // [0.00 0.50 0.75 1.00 1.25 1.50 2.00]
+#define WATER_TURBIDITY 1.00 // [0.50 0.75 1.00 1.50 2.00]
+#define CAUSTICS_STRENGTH 1.00 // [0.00 0.50 1.00 1.50]
+// Screen-space reflections of terrain on water (sky and clouds are always reflected).
+#define WATER_REFLECTIONS
+// Sun shafts in the water when the camera is underwater (needs Shadows).
+#define UNDERWATER_SHAFTS
+// Water running down the view for a moment after surfacing.
+#define VIEW_DROPLETS
 
 // ---------------------------------------------------------------------------------------------
 // Anti-aliasing: temporal (jittered geometry + reprojected history, lib/post/taa.glsl). Smooths jagged

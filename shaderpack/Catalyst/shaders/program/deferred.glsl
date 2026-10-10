@@ -32,8 +32,9 @@ uniform sampler2D depthtex0;
 
 in vec2 uv;
 
-/* RENDERTARGETS: 0 */
+/* RENDERTARGETS: 0,5 */
 layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outOpaqueCopy;
 
 void main() {
 	vec4 scene = texture(colortex0, uv);
@@ -53,6 +54,7 @@ void main() {
 #endif
 
 	outColor = scene;
+	outOpaqueCopy = vec4(scene.rgb, 1.0);
 }
 
 #endif

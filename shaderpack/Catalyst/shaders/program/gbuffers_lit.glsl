@@ -75,7 +75,9 @@ void main() {
 #include "/lib/material/labpbr.glsl"
 #include "/lib/lighting/forward.glsl"
 #include "/lib/atmosphere/clouds.glsl"
+#include "/lib/environment/water.glsl"
 #include "/lib/material/weather_surface.glsl"
+#include "/lib/lighting/transmitted_light.glsl"
 
 uniform sampler2D gtexture;
 // MATERIAL_MAPS is a user option; Iris only recognizes boolean options referenced by #ifdef.
@@ -135,12 +137,15 @@ void main() {
 #endif
 
 	float shadow = 1.0;
+	float lightTransmittance = 1.0; // glass tint / water absorption, for the Sun Shadow debug view
 #if defined SHADOW_RECEIVER
 	// Shadow lookups use the geometric normal: normal maps must not move the receiver.
 	float NdotL = dot(s.geoNormal, env.lightDir);
 	if (NdotL > 0.0 || s.transmission > 0.0) {
 		vec3 biasNormal = NdotL >= 0.0 ? s.geoNormal : -s.geoNormal; // offset toward the light
 		shadow = sampleShadow(playerPos, biasNormal, abs(NdotL), gl_FragCoord.xy);
+		// Light through stained glass is tinted; light under water is absorbed and forms caustics.
+		lightTransmittance = applyTranslucentShadow(env, playerPos, biasNormal, abs(NdotL));
 	} else {
 		shadow = 0.0; // faces turned away from the light receive no direct light (Sun Shadow debug view)
 	}
@@ -151,7 +156,7 @@ void main() {
 	outColor = vec4(shadeSurface(s, env, shadow, normalize(playerPos)), base.a);
 	outNormalLight = vec4(encodeNormal(s.normal), packLightmap(s.light), 1.0);
 	outAlbedo = vec4(base.rgb, 1.0);
-	outMaterial = vec4(float(materialClass) / 255.0, shadow, smoothness, 1.0);
+	outMaterial = vec4(float(materialClass) / 255.0, shadow * lightTransmittance, smoothness, 1.0);
 }
 
 #endif

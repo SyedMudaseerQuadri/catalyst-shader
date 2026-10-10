@@ -210,6 +210,23 @@ vec4 renderCirrus(vec3 dir, EnvState env) {
 	return vec4(radiance * opacity, 1.0 - opacity);
 }
 
+// Cheap cloud look-up for reflections (water): one coverage sample where the ray meets the layer's middle,
+// shaded flat. Positions match the real clouds, detail and self-shadowing do not.
+vec3 approximateCloudReflection(vec3 background, vec3 dir, EnvState env) {
+#if CLOUD_STYLE == 2 && defined DIM_OVERWORLD
+	if (dir.y <= 0.02) return background;
+	float t = (cumulusBottom() + CUMULUS_THICKNESS * 0.4 - cameraPosition.y) / dir.y;
+	if (t <= 0.0) return background;
+	float coverage = cumulusCoverage(cameraPosition.xz + dir.xz * t, env.cloudCover);
+	CloudLighting cl = getCloudLighting(env);
+	vec3 cloudColor = cl.direct * 0.45 * (0.6 + 0.4 * phaseRelative(dot(dir, cl.lightDir), 0.5)) + cl.ambientTop * 0.9;
+	float opacity = smoothstep(0.05, 0.6, coverage) * 0.9 * exp(-t / CLOUD_HAZE_DISTANCE);
+	return mix(background, cloudColor, opacity);
+#else
+	return background;
+#endif
+}
+
 // Composites both layers over `background` (sky or distant terrain) for a view ray.
 vec3 applyClouds(vec3 background, vec3 dir, float maxDistance, EnvState env, float dither) {
 #if CLOUD_STYLE == 2 && defined DIM_OVERWORLD

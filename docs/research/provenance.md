@@ -60,3 +60,14 @@ No reference-shader source code was used. `reference_shaders/` was not opened fo
 | Cloud phase | Henyey & Greenstein (1941) | two-lobe phase | forward + back lobe mix | algorithmic |
 | Volume integration | Hillaire, "Physically Based and Unified Volumetric Rendering in Frostbite" (SIGGRAPH 2015), public | energy-conserving per-step scattering integration | S * (1 - exp(-sigma dt)) | algorithmic |
 | Foliage anchoring | common public shader-pack practice, Iris `mc_midTexCoord` | top vs rooted vertex from the sprite center | own wind model | conceptual |
+
+## Recorded influences (M4 water)
+
+| Subsystem | Source | Concept | Catalyst interpretation | Influence type |
+|---|---|---|---|---|
+| Water optics | Pope & Fry (1997), "Absorption spectrum of pure water", public data | red absorbs strongly, blue weakly | rounded per-block coefficients | data (rounded) |
+| Light attenuation | Beer-Lambert law | exponential extinction along the path | view path (surface) and light path (shadow-map depth difference) | physics |
+| Refraction/Fresnel | Snell's law, Schlick (1994) | Snell's window, total internal reflection | `shadeWater()` from below | physics |
+| Screen-space reflections | McGuire & Mara, "Efficient GPU Screen-Space Ray Tracing" (JCGT 2014), public | view-space ray march against the depth buffer, edge fade | own growing-step march + bisection | conceptual |
+| Water depth from shadow maps | common public shader technique (shadowtex0 vs shadowtex1, Iris/OptiFine documentation) | depth difference between translucent and opaque casters | blocks via the projection's depth scale | conceptual |
+| Rain ripples | public common technique (ring waves per random cell) | expanding ring normal perturbation | own cell/phase scheme | conceptual |

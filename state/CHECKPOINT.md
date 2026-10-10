@@ -43,6 +43,13 @@ the cherry-grove view, water, a cave with a torch, the Nether. Pair each with a 
 13. Snow (M3): in a snowy biome during snowfall, block tops whiten unevenly over ~1 min and melt slowly afterwards.
 14. Wind (M3): grass and leaves sway in gusts (stronger in rain); their shadows move with them; no gaps between
     leaf blocks. Morning (`/time set 0`) shows thin mist in valleys, none on mountain tops.
+15. Water above (M4): shallow water is clear, deep water darkens to blue; swamp water is murky green-brown; the
+    surface refracts the bottom, reflects terrain/sky/clouds more at grazing angles, waves grow with wind/rain/storm,
+    raindrops make rings; thin water at shores shows faint foam. No flicker when moving (TAA).
+16. Under water (M4): sun reaches the bottom as moving caustics, dimmer with depth; light shafts from the surface;
+    looking up shows the sky through a circular window and mirror-like water beyond it.
+17. Surfacing (M4): water runs down the view for a few seconds. Stained glass casts colored shadows.
+18. Note FPS with Water > Terrain Reflections on/off and Underwater Light Shafts on/off.
 
 ## Safe resume
 Run `python tools/fetch_glslang.py` once, then `python tools/validate_shaderpack.py` (must PASS); continue from `CURRENT.md`.

@@ -35,3 +35,12 @@ Rule: data buffers (1-3) are always written with alpha = 1, so vanilla SRC_ALPHA
 | `normals` sampler | resource-pack `_n` textures (Iris) | LabPBR 1.3 normal (DirectX XY), b = AO, a = height | gbuffers lit/translucent via `lib/material/labpbr.glsl` | Iris flat default; option `MATERIAL_MAPS` off skips sampling |
 | `specular` sampler | resource-pack `_s` textures (Iris) | LabPBR 1.3 smoothness / F0-metal / SSS-porosity / emission | same | Iris zero default = no specular |
 | `at_tangent` attribute | Iris vertex format | xyz = dP/du, w = handedness (dP/dv = cross(T,N)·w) | same | zero for formats without tangents: normal mapping skipped |
+
+## M4 additions (2026-10-11)
+
+| Resource | Format | Channels / encoding | Producers | Consumers | Clear | Lifetime |
+|---|---|---|---|---|---|---|
+| colortex5 | R11F_G11F_B10F, full res | opaque HDR scene incl. sky and clouds | deferred | gbuffers_water (refraction, SSR) | never (fully rewritten each frame) | current frame |
+| shadowtex0 | depth | all shadow casters incl. water and glass (raw reads, `shadowHardwareFiltering0 = false`) | shadow | translucent-shadow lookup, underwater shafts | per frame | current frame |
+| shadowtex1 | depth | opaque/cutout casters only (Iris copy before translucents; hardware compare) | shadow | `sampleShadow` PCF, shafts | per frame | current frame |
+| shadowcolor0 | RGBA8 | a = 0.5 water flag; a = 1 with rgb = transmittance of tinted glass/ice; white = opaque | shadow | `sampleTranslucentShadow` | white per frame | current frame |

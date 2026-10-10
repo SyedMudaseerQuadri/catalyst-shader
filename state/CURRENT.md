@@ -1,6 +1,6 @@
 # Catalyst Current State
 
-**Milestone:** M4 — Water & Underwater (M1-M3 implemented; the user tests in-game at the end of the project)
+**Milestone:** M5 — Image quality, exposure, screen-space GI, reflections/post (M1-M4 implemented; the user tests in-game at the end of the project)
 **Status:** IN PROGRESS. Second in-game test done (EV-005): debug views and shadows pass; tone/color reworked in 0.3.0 (I-005, I-008), untested.
 **Current objective:** Temporal foundation: jittered TAA with history invalidation implemented (D-013), compile PASS, in-game UNVERIFIED. Per-object motion vectors impossible on Iris 1.10.7; entity-trail rejection used instead (D-013). M2 code-complete pending in-game check.
 

@@ -1,4 +1,5 @@
-// Catalyst — final pass: exposure, tonemap, grading, display encoding, debug views.
+// Catalyst — final pass: exposure, tonemap, grading, display encoding, debug views; water droplets on the view
+// for a few seconds after surfacing (VIEW_DROPLETS).
 
 #include "/lib/settings.glsl"
 #include "/lib/core/common.glsl"
@@ -24,6 +25,7 @@ void main() {
 
 #include "/lib/environment/state.glsl"
 #include "/lib/post/tonemap.glsl"
+#include "/lib/core/noise.glsl"
 
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -34,6 +36,34 @@ uniform sampler2D depthtex0;
 in vec2 uv;
 
 layout(location = 0) out vec4 outColor;
+
+#ifdef VIEW_DROPLETS
+uniform float viewWetness; // shaders.properties: 1 in water, fades with a ~3 s half-life after surfacing
+
+// Screen-space refraction offset of drops running down the view. Each cell of a coarse grid may hold one drop
+// that slides down and fades; fewer drops remain as the view dries.
+vec2 dropletOffset(vec2 screenUv) {
+	if (viewWetness < 0.02 || isEyeInWater != 0) return vec2(0.0);
+	float aspect = viewWidth / viewHeight;
+	vec2 p = vec2(screenUv.x * aspect, screenUv.y) * 7.0;
+	vec2 cell = floor(p);
+	vec2 offset = vec2(0.0);
+	for (int y = -1; y <= 1; y++) {
+		for (int x = -1; x <= 1; x++) {
+			ivec2 c = ivec2(cell) + ivec2(x, y);
+			float seed = hash21(c);
+			if (seed > viewWetness * 0.9) continue;
+			float life = fract(frameTimeCounter * (0.10 + 0.15 * hash21(c + ivec2(7, 3))) + seed);
+			vec2 center = vec2(c) + vec2(0.2 + 0.6 * hash21(c + ivec2(11, 5)), 1.0 - life * 1.2);
+			float radius = 0.10 + 0.14 * hash21(c + ivec2(2, 9));
+			vec2 d = (p - center) * vec2(1.0, 0.75); // slightly elongated along the run
+			float r = length(d) / radius;
+			if (r < 1.0) offset -= d / radius * (1.0 - r * r) * sin(life * PI);
+		}
+	}
+	return offset * 0.010 * viewWetness;
+}
+#endif
 
 // Distinct, readable colors for material classes in the debug view.
 vec3 materialDebugColor(int materialClass) {
@@ -74,7 +104,11 @@ vec3 debugView(vec3 displayColor) {
 }
 
 void main() {
-	vec3 hdr = texture(colortex0, uv).rgb;
+	vec2 sampleUv = uv;
+#ifdef VIEW_DROPLETS
+	sampleUv = clamp(uv + dropletOffset(uv), vec2(0.0), vec2(1.0));
+#endif
+	vec3 hdr = texture(colortex0, sampleUv).rgb;
 
 	EnvState env = getEnvState();
 	vec3 display = toneAndGrade(hdr, computeExposure(env));
