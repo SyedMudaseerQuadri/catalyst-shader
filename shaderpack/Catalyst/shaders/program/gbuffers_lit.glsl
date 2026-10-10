@@ -13,6 +13,7 @@
 #include "/lib/core/space.glsl"
 #include "/lib/core/encode.glsl"
 #include "/lib/material/classify.glsl"
+#include "/lib/post/taa.glsl"
 
 // =============================================================================================
 #if defined STAGE_VERTEX
@@ -44,7 +45,7 @@ void main() {
 	materialClass = MAT_ENTITY;
 #endif
 
-	gl_Position = ftransform();
+	gl_Position = taaJitterClip(ftransform());
 }
 
 #endif

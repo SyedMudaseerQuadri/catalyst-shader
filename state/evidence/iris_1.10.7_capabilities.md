@@ -22,3 +22,13 @@
 | `MC_RENDER_STAGE_<PHASE>` macros = `WorldRenderingPhase` ordinal | `gl/shader/StandardMacros.java` l.113, 352 | VERIFIED (source) |
 | Boolean option rule: a `#define X` is a menu option only if some line is exactly `#ifdef X`/`#ifndef X` | `shaderpack/option/OptionAnnotatedSource.java` | VERIFIED (source); Catalyst uses `#if defined` for internal flags |
 | Optional feature flags: `COMPUTE_SHADERS`, `SSBO`, `CUSTOM_IMAGES`, `PER_BUFFER_BLENDING`, `TESSELLATION_SHADERS`, `SEPARATE_HARDWARE_SAMPLERS` (hardware-gated) | `features/FeatureFlags.java` | VERIFIED (source); none are required by M1 |
+
+## Addendum 2026-10-11 — features used by TAA (same commit `0a1fcaae`)
+
+| Feature | Source file | Result |
+|---|---|---|
+| `gbufferPreviousModelView`, `gbufferPreviousProjection` (previous frame's matrix, per frame) | `uniforms/MatrixUniforms.java` l.38, 66-83 | VERIFIED (source) |
+| `previousCameraPosition`; origin shift is applied to current and previous alike, so their difference is exact | `uniforms/CameraUniforms.java` l.30, 62-120 | VERIFIED (source) |
+| `colortexNClear = false` keeps a buffer out of the per-frame clear list | `shaderpack/properties/PackRenderTargetDirectives.java` l.55-64, 116 | VERIFIED (source) |
+| `MC_HAND_DEPTH` macro = `HandRenderer.DEPTH` = 0.125 (hand projection z scaled by 0.125) | `gl/shader/StandardMacros.java` l.104, `pathways/HandRenderer.java` l.39, 56 | VERIFIED (source) |
+| History persistence across frames for a never-cleared buffer read and written by one composite pass | `targets/BufferFlipper.java` (ping-pong) | source read; runtime UNVERIFIED |

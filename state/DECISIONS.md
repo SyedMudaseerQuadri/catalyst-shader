@@ -79,3 +79,12 @@ noon 3.10) x subtle local adaptation (`EXPOSURE_ADAPTATION` default 0.15);
 (3) clear-sky dome and sky ambient scale with sun height (`daylightSkyScale`), dome uses `PRESET_SKY_DOME_VANILLA`;
 (4) block/sky light falloff powers 4.0 / 3.5 (vanilla's curve lives in display space) and block-light hue that warms
 as it dims; multi-bounce strength 0.35; (5) clouds include sky in-scatter so they are never darker than the sky.
+
+## D-013 — Temporal anti-aliasing design (M2 temporal foundation)
+Jittered TAA in a dedicated composite1 pass on the fogged HDR scene, before exposure/tonemap (so exposure changes
+never smear through history). Camera-only reprojection from depth (no per-object motion vectors yet: entities rely on
+neighborhood clipping; ghosting on fast mobs is a known limitation). History in colortex4 (RGBA16F, never cleared).
+Centralized invalidation in `lib/post/taa.glsl`: empty history, camera jump > 4 blocks/frame (teleport, portal,
+respawn), off-screen reprojection. The hand is not reprojected (it moves with the camera). Lines/outlines and the sky
+pass are not jittered. Debug views disable jitter. One user option, `TAA` (default on in every profile: the cost is
+one fullscreen pass with 14 texture reads per pixel).

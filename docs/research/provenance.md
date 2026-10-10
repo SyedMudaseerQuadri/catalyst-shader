@@ -37,3 +37,14 @@ No reference-shader source code was used. `reference_shaders/` was not opened fo
 | Visibility | Heitz, "Understanding the Masking-Shadowing Function in Microfacet-Based BRDFs" (JCGT 2014) | height-correlated Smith G2 | `smithGgxCorrelatedVisibility()` | algorithmic |
 | Fresnel | Schlick (1994) | Fresnel approximation | `fresnelSchlick()` | algorithmic |
 | Environment BRDF | Karis, "Physically Based Shading on Mobile" (Unreal Engine blog, 2014) | analytic split-sum fit, F0 < 2% treated as no specular | `environmentBrdf()` | algorithmic (published fit constants) |
+
+## Recorded influences (M2 temporal)
+
+| Subsystem | Source | Concept | Catalyst interpretation | Influence type |
+|---|---|---|---|---|
+| TAA overall | Karis, "High Quality Temporal Supersampling" (SIGGRAPH 2014 course), public | jittered projection, reprojected history, neighborhood clamp, luminance-weighted blending | `lib/post/taa.glsl`, `program/taa.glsl` | algorithmic |
+| Jitter sequence | Halton (1964) low-discrepancy sequence, public mathematics | base 2 / base 3 radical inverse | 8-position cycle in `taaHalton()` | algorithmic |
+| History filter | Jimenez et al., "Filmic SMAA" (SIGGRAPH 2016 course), public | 5-tap bilinear Catmull-Rom approximation | `taaSampleHistory()` | algorithmic |
+| History rejection | Salvi, "An Excursion in Temporal Supersampling" (GDC 2016), public | variance (mean +- sigma) neighborhood box | intersected with min/max box, YCoCg | algorithmic |
+| History clipping | Pedersen, "Temporal Reprojection Anti-Aliasing in INSIDE" (GDC 2016), public talk | clip toward box center instead of per-channel clamp | `taaClipToBox()`; no code used | conceptual |
+| Previous-frame data | Iris `MatrixUniforms` / `CameraUniforms` (LGPL-3.0, read for the interface contract only) | `gbufferPrevious*`, `previousCameraPosition`, origin shift keeps the camera delta exact | uniform declarations only | interface contract |

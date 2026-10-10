@@ -10,6 +10,7 @@
 #include "/lib/core/space.glsl"
 #include "/lib/core/encode.glsl"
 #include "/lib/material/classify.glsl"
+#include "/lib/post/taa.glsl"
 
 // =============================================================================================
 #if defined STAGE_VERTEX
@@ -36,7 +37,7 @@ void main() {
 	tangentPlayer = vec4(mat3(gbufferModelViewInverse) * (gl_NormalMatrix * at_tangent.xyz), at_tangent.w);
 	materialClass = materialFromBlockId(int(mc_Entity.x + 0.5));
 
-	gl_Position = ftransform();
+	gl_Position = taaJitterClip(ftransform());
 }
 
 #endif

@@ -52,6 +52,7 @@ STANDARD_MACROS = {
     "MC_MIPMAP_LEVEL": "4",
     "MC_RENDER_QUALITY": "1.0",
     "MC_SHADOW_QUALITY": "1.0",
+    "MC_HAND_DEPTH": "0.125",  # HandRenderer.DEPTH (StandardMacros.java l.104)
     **{f"MC_RENDER_STAGE_{name}": str(i) for i, name in enumerate(RENDER_PHASES)},
 }
 
@@ -264,6 +265,7 @@ def main() -> int:
             configs[f"SHADOW_FILTER={v}"] = {"SHADOW_FILTER": v}
         configs["SHADOWS=off"] = {"SHADOWS": "false"}
         configs["MATERIAL_MAPS=off"] = {"MATERIAL_MAPS": "false"}
+        configs["TAA=off"] = {"TAA": "false"}
 
     # ---------------------------------------------------------------- compilation
     compiled = 0

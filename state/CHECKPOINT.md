@@ -14,7 +14,7 @@ Git checkpoints: tag `m1-compile-verified`, then tag `m2-materials-compile-verif
 
 ## Verification state
 - Iris feature set: checked in source (EV-001); runtime UNVERIFIED.
-- Shader compilation: PASS under Khronos glslang 16.6.0 (pinned), 2254 compilations across 23 configurations (EV-003).
+- Shader compilation: PASS under Khronos glslang 16.6.0 (pinned), 2496 compilations across 24 configurations (incl. TAA off), 2026-10-11.
 - Specular BRDF energy conservation: PASS (EV-003).
 - Shader runtime: loads in-game (EV-004). Debug views PASS. Normal-view look: interior REWORK fixed in 0.2.1, re-test pending. Performance: UNVERIFIED.
 - Cross-vendor GPU validation: not available.
@@ -32,6 +32,9 @@ the cherry-grove view, water, a cave with a torch, the Nether. Pair each with a 
 7. Note FPS at 1080p on the RTX 4060 for Performance and Balanced (proxy data only until I-001 is resolved).
 8. With a LabPBR resource pack: bumps are lit from the sun's side (not inverted); metals reflect the sky; Debug > Smoothness shows the pack's data.
 9. Without a resource pack: vanilla blocks look the same as with `Resource Pack Materials` off (no added shine).
+10. TAA (build after 0.3.0): block edges and leaves smooth and stable when still; turning the camera does not smear;
+    the held item has no trail; teleport (`/tp ~100 ~ ~`) and Nether portal show no flash of old frames; note the FPS
+    with Anti-Aliasing > Temporal Anti-Aliasing on and off.
 
 ## Safe resume
 Run `python tools/fetch_glslang.py` once, then `python tools/validate_shaderpack.py` (must PASS); continue from `CURRENT.md`.

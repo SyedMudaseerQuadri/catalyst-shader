@@ -15,9 +15,12 @@ uniform mat4 gbufferModelView;
 uniform mat4 gbufferModelViewInverse;
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
+uniform mat4 gbufferPreviousModelView;  // previous frame (TAA reprojection)
+uniform mat4 gbufferPreviousProjection;
 uniform mat4 shadowModelView;
 uniform mat4 shadowProjection;
 uniform vec3 cameraPosition;
+uniform vec3 previousCameraPosition;   // same shifted origin as cameraPosition (Iris keeps their difference exact)
 uniform float near;
 uniform float far;
 

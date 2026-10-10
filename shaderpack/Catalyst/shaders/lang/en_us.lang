@@ -25,6 +25,7 @@ screen.SHADOWS_SCREEN=Shadows
 screen.MATERIALS=Materials
 screen.ATMOSPHERE=Atmosphere
 screen.COLOR=Color & Exposure
+screen.IMAGE=Anti-Aliasing
 screen.DEBUG=Debug
 
 # ---- Lighting
@@ -74,6 +75,10 @@ option.EXPOSURE_ADAPTATION=Eye Adaptation
 option.EXPOSURE_ADAPTATION.comment=How much brightness adjusts between dark and bright places. Low keeps interiors and caves naturally darker.
 option.SATURATION=Saturation
 option.CONTRAST=Contrast
+
+# ---- Anti-aliasing
+option.TAA=Temporal Anti-Aliasing
+option.TAA.comment=Smooths jagged edges and shimmering leaves and shadows by reusing previous frames. Fast-moving mobs may leave a faint trail.
 
 # ---- Debug
 option.DEBUG_VIEW=Debug View

@@ -6,6 +6,7 @@ const int colortex0Format = RGBA16F;
 const int colortex1Format = RGBA16;
 const int colortex2Format = RGBA8;
 const int colortex3Format = RGBA8;
+const int colortex4Format = RGBA16F;
 */
 //
 // Data buffers (1-3) always receive alpha = 1 from their producers. Under vanilla SRC_ALPHA blending
@@ -26,5 +27,8 @@ const vec4 colortex2ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 // colortex3: r = material class / 255, g = direct-light shadow visibility, b = unused, a = 1 / 0.
 const bool colortex3Clear = true;
 const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+// colortex4: TAA history (resolved HDR scene of the previous frame), a = 1 once written. Never cleared:
+// it must survive into the next frame. Written only by composite1 (program/taa.glsl).
+const bool colortex4Clear = false;
 
 #endif

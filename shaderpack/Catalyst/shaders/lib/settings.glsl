@@ -36,6 +36,11 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define SPECULAR_INTENSITY 1.00 // [0.00 0.25 0.50 0.75 1.00 1.25 1.50]
 
 // ---------------------------------------------------------------------------------------------
+// Anti-aliasing: temporal (jittered geometry + reprojected history, lib/post/taa.glsl). Smooths jagged
+// edges and shimmering foliage/shadows; cheap on every profile.
+#define TAA
+
+// ---------------------------------------------------------------------------------------------
 // Artistic controls — multipliers over the visual preset (1.00 = preset default)
 #define SUN_INTENSITY 1.00 // [0.50 0.75 1.00 1.25 1.50 2.00]
 #define AMBIENT_INTENSITY 1.00 // [0.50 0.75 1.00 1.25 1.50 2.00]

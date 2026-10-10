@@ -10,6 +10,7 @@
 #include "/lib/core/uniforms.glsl"
 #include "/lib/core/space.glsl"
 #include "/lib/core/encode.glsl"
+#include "/lib/post/taa.glsl"
 
 // =============================================================================================
 #if defined STAGE_VERTEX
@@ -28,6 +29,9 @@ void main() {
 	playerPos = playerFromView(viewPos);
 	geoNormal = mat3(gbufferModelViewInverse) * (gl_NormalMatrix * gl_Normal);
 	gl_Position = ftransform();
+#if !defined PROGRAM_BASIC
+	gl_Position = taaJitterClip(gl_Position); // lines and outlines stay crisp: not jittered
+#endif
 }
 
 #endif
