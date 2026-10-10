@@ -44,3 +44,10 @@ Rule: data buffers (1-3) are always written with alpha = 1, so vanilla SRC_ALPHA
 | shadowtex0 | depth | all shadow casters incl. water and glass (raw reads, `shadowHardwareFiltering0 = false`) | shadow | translucent-shadow lookup, underwater shafts | per frame | current frame |
 | shadowtex1 | depth | opaque/cutout casters only (Iris copy before translucents; hardware compare) | shadow | `sampleShadow` PCF, shafts | per frame | current frame |
 | shadowcolor0 | RGBA8 | a = 0.5 water flag; a = 1 with rgb = transmittance of tinted glass/ice; white = opaque | shadow | `sampleTranslucentShadow` | white per frame | current frame |
+
+## M5 additions (2026-10-11)
+
+| Resource | Format | Channels / encoding | Producers | Consumers | Clear | Lifetime |
+|---|---|---|---|---|---|---|
+| colortex6 | RGBA16F | rgb = indirect diffuse radiance contained in colortex0; a = reflection weight x 0.5 (terrain, unblended) or 1 = no reflection data (entities/hand/particles, blended with SRC_ALPHA so alpha must be 1) | gbuffers_terrain / entities / hand / block / textured_lit | deferred (AO, SSR) | 0 every frame | current frame |
+| colortex7 | R11F_G11F_B10F | bloom | composite2 | final | never (fully rewritten) | current frame |

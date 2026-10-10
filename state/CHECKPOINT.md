@@ -50,6 +50,13 @@ the cherry-grove view, water, a cave with a torch, the Nether. Pair each with a 
     looking up shows the sky through a circular window and mirror-like water beyond it.
 17. Surfacing (M4): water runs down the view for a few seconds. Stained glass casts colored shadows.
 18. Note FPS with Water > Terrain Reflections on/off and Underwater Light Shafts on/off.
+19. Bounce light (M5): in the test room and next to a lava pool, compare Lighting > Bounce Light on/off: corners
+    get soft contact shadows, sunlit floors/lava tint nearby walls; the room must NOT get brighter/flatter overall
+    than with it off (watch item, D-016). Note FPS on/off.
+20. Reflections (M5): puddles in rain reflect nearby trees/blocks, not only the sky; no reflections floating in
+    mid-air when turning the camera.
+21. Volumetric light and bloom (M5): morning sun through trees shows soft shafts; torches/lava/sun glow slightly;
+    dark caves stay dark (bloom must not lift them). The three visual styles look distinct but all readable.
 
 ## Safe resume
 Run `python tools/fetch_glslang.py` once, then `python tools/validate_shaderpack.py` (must PASS); continue from `CURRENT.md`.

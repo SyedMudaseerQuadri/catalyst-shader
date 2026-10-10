@@ -66,8 +66,20 @@ vec3 tonemapShoulder(vec3 c) {
 }
 
 // Scene-linear HDR in, display-linear [0,1] out.
+// Visual-preset grade: a gentle split tone (warm highlights / cool shadows) for the cinematic look, applied in
+// scene-linear before the tonemap so it stays smooth. Luminance-preserving; 0 = neutral.
+vec3 applySplitTone(vec3 c, float amount) {
+	if (amount <= 0.0) return c;
+	float l = luminance(c);
+	float highlights = smoothstep(0.10, 0.80, l);
+	vec3 tint = mix(vec3(0.94, 0.98, 1.06), vec3(1.05, 1.00, 0.93), highlights);
+	vec3 graded = c * mix(vec3(1.0), tint, amount);
+	return graded * (l / max(luminance(graded), 1e-6));
+}
+
 vec3 toneAndGrade(vec3 hdr, float exposure) {
 	vec3 c = hdr * exposure;
+	c = applySplitTone(c, PRESET_SPLIT_TONE);
 	c = applyContrast(c, PRESET_CONTRAST * CONTRAST);
 	c = applySaturation(c, PRESET_SATURATION * SATURATION);
 	return saturate(tonemapShoulder(c));

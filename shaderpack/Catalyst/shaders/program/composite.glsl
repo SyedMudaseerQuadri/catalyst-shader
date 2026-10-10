@@ -1,5 +1,5 @@
 // Catalyst — composite pass: atmospheric / medium fog over the finished HDR scene (opaque + translucent),
-// plus underwater light shafts when the eye is in water.
+// plus volumetric sunlight (shafts through trees and mist) and underwater light shafts.
 
 #include "/lib/settings.glsl"
 #include "/lib/core/common.glsl"
@@ -21,12 +21,10 @@ void main() {
 // =============================================================================================
 #if defined STAGE_FRAGMENT
 
-// Shafts read the shadow maps; UNDERWATER_SHAFTS is a user option (Iris needs #ifdef to list it).
-#ifdef UNDERWATER_SHAFTS
-	#ifdef SHADOWS
-		#if defined DIM_OVERWORLD
-			#define SHADOW_RECEIVER
-		#endif
+// Volumetric sunlight and underwater shafts read the shadow maps (user options; Iris needs #ifdef to list them).
+#ifdef SHADOWS
+	#if defined DIM_OVERWORLD
+		#define SHADOW_RECEIVER
 	#endif
 #endif
 
@@ -37,6 +35,7 @@ void main() {
 #include "/lib/atmosphere/clouds.glsl"
 #include "/lib/environment/water.glsl"
 #include "/lib/atmosphere/underwater.glsl"
+#include "/lib/atmosphere/volumetric.glsl"
 
 uniform sampler2D colortex0;
 uniform sampler2D depthtex0;
@@ -61,10 +60,13 @@ void main() {
 	EnvState env = getEnvState();
 	color = applyAtmosphericFog(color, playerPos, isSky, env);
 #if defined SHADOW_RECEIVER
-	if (isEyeInWater == 1) {
-		float dither = interleavedGradientNoise(gl_FragCoord.xy + 5.588238 * float(frameCounter % 64));
-		color += underwaterShafts(playerPos, env, dither);
-	}
+	float dither = interleavedGradientNoise(gl_FragCoord.xy + 5.588238 * float(frameCounter % 64));
+	#ifdef UNDERWATER_SHAFTS
+	if (isEyeInWater == 1) color += underwaterShafts(playerPos, env, dither);
+	#endif
+	#ifdef VOLUMETRIC_LIGHT
+	if (isEyeInWater == 0) color += volumetricSunlight(playerPos, isSky, env, dither);
+	#endif
 #endif
 
 	outColor = vec4(color, 1.0);

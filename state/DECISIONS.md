@@ -121,3 +121,17 @@ cast colored shadows (shadowcolor0 rgb) instead of black ones. Underwater view: 
 shadow maps (`UNDERWATER_SHAFTS`). After surfacing: droplets running down the view (`VIEW_DROPLETS`, ~3 s).
 Limitations: entities and particles behind water are covered by the opaque water write if drawn before it;
 shoreline sand is not darkened (no water-proximity data in opaque passes); the underwater-light effects need Shadows.
+
+## D-016 — Image quality and indirect light (M5)
+Screen-space GI + AO in a new first deferred pass on the opaque, forward-lit scene: cosine-weighted rays through the
+depth buffer (2/3/4/6/8 rays by internal tier); hits within 1.2 blocks remove that share of the stored indirect
+diffuse light (colortex6, written by the lit programs), and every front-facing hit returns its lit radiance as
+bounce light (color bleeding, lava glow). It is the permanent indirect method for Low/Medium/High; Ultra/Extreme
+use it with more rays until voxel GI (M6) has measured evidence. With GI on, the multi-bounce fit drops from 0.35
+to 0.15 to avoid counting bounce twice. Glossy SSR (puddles, wet and polished surfaces) replaces the sky reflection
+by the hit radiance using the stored reflection weight. Volumetric sunlight marches the shadow map through the same
+air density as the fog (haze, rain, valley mist). Bloom: 6-level mip chain tent filter, mixed as a small constant
+share (readability: it never lifts dark scenes). Visual presets now also differ in bloom share (0.03/0.05/0.08),
+volumetric strength (0.20/0.30/0.45) and a luminance-preserving split tone (0/0.12/0.35).
+Watch item: bounce light can brighten interiors; compare Bounce Light on/off in the test room (EV-005 room).
+Not done (aesthetic direction allows them as options; DEFER): depth of field, motion blur, lens effects.

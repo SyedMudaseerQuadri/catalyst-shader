@@ -97,11 +97,12 @@ in vec3 geoNormal;
 in vec4 tangentPlayer;
 flat in int materialClass;
 
-/* RENDERTARGETS: 0,1,2,3 */
+/* RENDERTARGETS: 0,1,2,3,6 */
 layout(location = 0) out vec4 outColor;
 layout(location = 1) out vec4 outNormalLight;
 layout(location = 2) out vec4 outAlbedo;
 layout(location = 3) out vec4 outMaterial;
+layout(location = 4) out vec4 outIndirect;
 
 void main() {
 	vec4 texel = texture(gtexture, texcoord);
@@ -153,7 +154,16 @@ void main() {
 	shadow *= cloudShadow(playerPos, env);
 
 	float smoothness = max(s.f0.r, max(s.f0.g, s.f0.b)) > 0.0 ? 1.0 - sqrt(s.roughness) : 0.0;
-	outColor = vec4(shadeSurface(s, env, shadow, normalize(playerPos)), base.a);
+	vec3 indirectDiffuse;
+	float reflectionWeight;
+	outColor = vec4(shadeSurfaceDetailed(s, env, shadow, normalize(playerPos), indirectDiffuse, reflectionWeight), base.a);
+#if defined PROGRAM_TERRAIN
+	// Terrain is drawn without blending: alpha carries the reflection weight (x0.5, so it never reads as 1).
+	outIndirect = vec4(indirectDiffuse, reflectionWeight * 0.5);
+#else
+	// Entities, hand and particles blend with SRC_ALPHA: alpha must be 1 (exact overwrite) = "no reflection data".
+	outIndirect = vec4(indirectDiffuse, 1.0);
+#endif
 	outNormalLight = vec4(encodeNormal(s.normal), packLightmap(s.light), 1.0);
 	outAlbedo = vec4(base.rgb, 1.0);
 	outMaterial = vec4(float(materialClass) / 255.0, shadow * lightTransmittance, smoothness, 1.0);

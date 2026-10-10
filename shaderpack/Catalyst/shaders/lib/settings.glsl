@@ -67,6 +67,20 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 #define VIEW_DROPLETS
 
 // ---------------------------------------------------------------------------------------------
+// Indirect light and image (M5). Screen-space GI is the indirect-light method of the Performance..Quality profiles.
+#define SCREEN_SPACE_GI
+#define GI_STRENGTH 1.00 // [0.00 0.50 0.75 1.00 1.25 1.50 2.00]
+#define AO_STRENGTH 0.70 // [0.00 0.35 0.50 0.70 0.85 1.00]
+// Reflections of terrain in puddles, wet and polished surfaces (screen space).
+#define GLOSSY_REFLECTIONS
+// Sunlight scattered in haze and mist, with shafts where trees and terrain cast shadows (needs Shadows).
+#define VOLUMETRIC_LIGHT
+#define VOLUMETRIC_STRENGTH 1.00 // [0.00 0.50 0.75 1.00 1.50 2.00]
+// Glow around bright light sources.
+#define BLOOM
+#define BLOOM_STRENGTH 1.00 // [0.00 0.50 0.75 1.00 1.50 2.00]
+
+// ---------------------------------------------------------------------------------------------
 // Anti-aliasing: temporal (jittered geometry + reprojected history, lib/post/taa.glsl). Smooths jagged
 // edges and shimmering foliage/shadows; cheap on every profile.
 #define TAA
@@ -96,6 +110,9 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 // =============================================================================================
 #if VISUAL_PRESET == 0
 	// Vanilla Enhanced — closest to Minecraft identity.
+	const float PRESET_BLOOM               = 0.03; // share of light spread by bloom
+	const float PRESET_VOLUMETRIC          = 0.20; // volumetric sunlight strength
+	const float PRESET_SPLIT_TONE          = 0.00; // warm highlights / cool shadows
 	const float PRESET_CLOUD_COVERAGE     = 0.40; // clear-weather cumulus coverage
 	const float PRESET_VANILLA_SKY_BLEND   = 0.60; // weight of the biome's vanilla sky color in ambient light
 	const float PRESET_SKY_DOME_VANILLA    = 0.80; // weight of the biome's vanilla sky color in the visible sky
@@ -108,6 +125,9 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 	const float PRESET_SHADOW_AMBIENT     = 1.10; // ambient share in shade; >1 = softer contrast
 #elif VISUAL_PRESET == 2
 	// Cinematic — stronger atmosphere and contrast, still readable.
+	const float PRESET_BLOOM               = 0.08; // share of light spread by bloom
+	const float PRESET_VOLUMETRIC          = 0.45; // volumetric sunlight strength
+	const float PRESET_SPLIT_TONE          = 0.35; // warm highlights / cool shadows
 	const float PRESET_CLOUD_COVERAGE     = 0.50; // clear-weather cumulus coverage
 	const float PRESET_VANILLA_SKY_BLEND   = 0.20;
 	const float PRESET_SKY_DOME_VANILLA    = 0.45;
@@ -120,6 +140,9 @@ const float sunPathRotation = -20.0; // [-40.0 -30.0 -20.0 -10.0 0.0 10.0 20.0 3
 	const float PRESET_SHADOW_AMBIENT     = 0.85;
 #else
 	// Natural / Realistic — default target (~60% natural / 40% cinematic).
+	const float PRESET_BLOOM               = 0.05; // share of light spread by bloom
+	const float PRESET_VOLUMETRIC          = 0.30; // volumetric sunlight strength
+	const float PRESET_SPLIT_TONE          = 0.12; // warm highlights / cool shadows
 	const float PRESET_CLOUD_COVERAGE     = 0.45; // clear-weather cumulus coverage
 	const float PRESET_VANILLA_SKY_BLEND   = 0.35;
 	const float PRESET_SKY_DOME_VANILLA    = 0.60;

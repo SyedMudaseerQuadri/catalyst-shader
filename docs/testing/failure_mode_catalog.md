@@ -23,3 +23,13 @@ water edge artifacts · voxel leaks/stair-stepping · light bleeding · path-tra
 · denoiser blur · cloud swimming · volumetric flicker · exposure pumping · tonemap clipping ·
 banding · color shifts · underwater discontinuity · emissive over-brightness · translucent
 shadow errors · performance regression.
+
+## Known limitation: screen-space GI/AO/reflections (M5, D-016)
+- **Symptom:** bounce light and reflections change when the source leaves the screen; slight light leaking or dark
+  halos at object edges; reflections end at screen borders.
+- **Trigger:** turning the camera away from a bright surface (e.g. a lava pool or a sunlit floor) that lights a wall.
+- **Subsystem:** `program/deferred_gi.glsl`, `lib/lighting/ssr.glsl`.
+- **Root cause:** screen space only knows visible geometry (catalyst_architecture.md, GI strategy).
+- **Status:** accepted limitation for the internal Low/Medium/High tiers; edge fades soften it. Voxel GI (M6) would
+  remove it for Ultra/Extreme once measured evidence exists.
+- **Regression coverage:** CHECKPOINT test item 19 (Bounce Light on/off, room and lava scenes).

@@ -31,6 +31,9 @@ uniform sampler2D colortex0;
 uniform sampler2D colortex1;
 uniform sampler2D colortex2;
 uniform sampler2D colortex3;
+#ifdef BLOOM
+uniform sampler2D colortex7; // bloom (composite2)
+#endif
 uniform sampler2D depthtex0;
 
 in vec2 uv;
@@ -109,6 +112,11 @@ void main() {
 	sampleUv = clamp(uv + dropletOffset(uv), vec2(0.0), vec2(1.0));
 #endif
 	vec3 hdr = texture(colortex0, sampleUv).rgb;
+#ifdef BLOOM
+	// Energy-conserving mix: a small, constant share of light spreads to its surroundings. It never lifts dark
+	// scenes by itself (readability) and only becomes visible around genuinely bright sources.
+	hdr = mix(hdr, texture(colortex7, sampleUv).rgb, saturate(PRESET_BLOOM * BLOOM_STRENGTH));
+#endif
 
 	EnvState env = getEnvState();
 	vec3 display = toneAndGrade(hdr, computeExposure(env));

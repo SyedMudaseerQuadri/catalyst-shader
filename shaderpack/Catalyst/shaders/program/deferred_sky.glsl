@@ -1,4 +1,4 @@
-// Catalyst — deferred pass (after opaque geometry, before translucents).
+// Catalyst — deferred1 (after deferred_gi, before translucents).
 // Fills any sky pixel that no sky geometry covered (colortex0 alpha still 0 from the clear), so the background
 // is never undefined black, then composites the volumetric clouds over the sky and over terrain beyond them.
 // Translucents (water, glass) are drawn after this pass, on top of the clouds. Future home of SSAO / GI (M5).

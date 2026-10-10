@@ -42,8 +42,13 @@ float directSkyAccess(float skyLevel) {
 	return smoothstep(0.05, 0.35, skyLevel);
 }
 
-// Share of the multi-bounce term (0 = plain occlusion, 1 = full fit). Stands in for GI until M5.
+// Share of the multi-bounce term (0 = plain occlusion, 1 = full fit). With screen-space GI on (M5) most
+// interreflection is gathered for real, so the fit only covers what the screen cannot see.
+#ifdef SCREEN_SPACE_GI
+const float BOUNCE_STRENGTH = 0.15;
+#else
 const float BOUNCE_STRENGTH = 0.35;
+#endif
 
 // Multi-bounce occlusion fit (Jimenez et al. 2016, "Practical Real-Time Strategies for Accurate Indirect
 // Occlusion"): occluded light is partly bounced back by nearby surfaces of similar albedo, so occlusion
@@ -58,7 +63,13 @@ vec3 multiBounce(float visibility, vec3 albedo) {
 }
 
 // `viewDir`: unit vector from the eye toward the surface, player space.
-vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir) {
+// Also returns the indirect diffuse radiance part of the result and the scalar weight of the environment
+// reflection (sky reflection = weight * reflected radiance), so deferred passes can refine exactly those terms
+// (screen-space AO/GI and reflections, program/deferred_gi.glsl).
+vec3 shadeSurfaceDetailed(Surface s, EnvState env, float shadowVisibility, vec3 viewDir,
+                          out vec3 indirectDiffuse, out float reflectionWeight) {
+	indirectDiffuse = vec3(0.0);
+	reflectionWeight = 0.0;
 	vec3 v = -viewDir;
 	float NdotL = dot(s.normal, env.lightDir);
 	float NdotV = max(dot(s.normal, v), 1e-4);
@@ -108,6 +119,7 @@ vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir)
 	vec3 emitted = s.albedo * s.emission * 4.0 * EMISSIVE_INTENSITY;
 
 	if (!hasSpecular) {
+		indirectDiffuse = s.albedo * indirect;
 		return s.albedo * (direct + indirect) + emitted;
 	}
 
@@ -115,6 +127,7 @@ vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir)
 	vec3 fresnelView = fresnelSchlick(NdotV, s.f0);
 	vec3 kd = (1.0 - fresnelView) * (1.0 - s.metalness);
 	vec3 color = s.albedo * kd * (direct + indirect) + emitted;
+	indirectDiffuse = s.albedo * kd * indirect;
 
 	float alpha = max(s.roughness, MIN_ROUGHNESS);
 	color += env.lightRadiance * directSpecular(s.normal, v, env.lightDir, alpha, s.f0)
@@ -127,10 +140,20 @@ vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir)
 	r = normalize(mix(r, s.normal, alpha * alpha));
 	vec3 reflected = mix(skyRadiance(r, env), env.skyAmbient, alpha);
 	float specularOcclusion = skyLightFalloff(s.light.y) * s.ao;
-	color += reflected * environmentBrdf(s.f0, NdotV, alpha) * specularOcclusion * SPECULAR_INTENSITY;
+	vec3 brdfWeight = environmentBrdf(s.f0, NdotV, alpha) * SPECULAR_INTENSITY;
+	color += reflected * brdfWeight * specularOcclusion;
+	reflectionWeight = luminance(brdfWeight);
+#else
+	reflectionWeight = luminance(environmentBrdf(s.f0, NdotV, alpha) * SPECULAR_INTENSITY);
 #endif
 
 	return color;
+}
+
+vec3 shadeSurface(Surface s, EnvState env, float shadowVisibility, vec3 viewDir) {
+	vec3 indirectDiffuse;
+	float reflectionWeight;
+	return shadeSurfaceDetailed(s, env, shadowVisibility, viewDir, indirectDiffuse, reflectionWeight);
 }
 
 #endif

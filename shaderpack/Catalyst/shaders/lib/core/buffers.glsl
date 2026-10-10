@@ -8,6 +8,8 @@ const int colortex2Format = RGBA8;
 const int colortex3Format = RGBA8;
 const int colortex4Format = RGBA16F;
 const int colortex5Format = R11F_G11F_B10F;
+const int colortex6Format = RGBA16F;
+const int colortex7Format = R11F_G11F_B10F;
 */
 //
 // Data buffers (1-3) always receive alpha = 1 from their producers. Under vanilla SRC_ALPHA blending
@@ -35,5 +37,12 @@ const bool colortex4Clear = false;
 // refraction and screen-space reflections (a buffer cannot be read while it is being drawn to). Fully rewritten
 // every frame, so it is not cleared.
 const bool colortex5Clear = false;
+// colortex6: rgb = indirect diffuse radiance already contained in colortex0 (albedo x ambient/block/bounce light),
+// a = scalar weight of the environment reflection; written by the opaque lit programs, refined by deferred_gi
+// (screen-space AO removes occluded indirect light, GI adds gathered bounce, SSR swaps sky for hit radiance).
+const bool colortex6Clear = true;
+const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+// colortex7: bloom (composite2, from colortex0 mipmaps), read by final. Fully rewritten each frame.
+const bool colortex7Clear = false;
 
 #endif

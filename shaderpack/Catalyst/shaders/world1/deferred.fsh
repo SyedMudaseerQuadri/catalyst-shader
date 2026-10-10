@@ -1,4 +1,4 @@
 #version 330 compatibility
 #define DIM_END
 #define STAGE_FRAGMENT
-#include "/program/deferred.glsl"
+#include "/program/deferred_gi.glsl"

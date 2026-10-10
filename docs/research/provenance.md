@@ -71,3 +71,13 @@ No reference-shader source code was used. `reference_shaders/` was not opened fo
 | Screen-space reflections | McGuire & Mara, "Efficient GPU Screen-Space Ray Tracing" (JCGT 2014), public | view-space ray march against the depth buffer, edge fade | own growing-step march + bisection | conceptual |
 | Water depth from shadow maps | common public shader technique (shadowtex0 vs shadowtex1, Iris/OptiFine documentation) | depth difference between translucent and opaque casters | blocks via the projection's depth scale | conceptual |
 | Rain ripples | public common technique (ring waves per random cell) | expanding ring normal perturbation | own cell/phase scheme | conceptual |
+
+## Recorded influences (M5 image quality)
+
+| Subsystem | Source | Concept | Catalyst interpretation | Influence type |
+|---|---|---|---|---|
+| Screen-space GI/AO | Ritschel, Grosch & Seidel, "Approximating Dynamic Global Illumination in Image Space" (I3D 2009), public | rays in screen space: occluded directions return the radiance of the occluder | cosine rays, AO limited to the stored indirect term | conceptual |
+| Cosine sampling | standard Monte Carlo (Malley's method) | cosine-weighted hemisphere | `deferred_gi.glsl` | mathematics |
+| Bloom | Jimenez, "Next Generation Post Processing in Call of Duty: Advanced Warfare" (SIGGRAPH 2014), public | mip-chain bloom with tent upsampling, energy-conserving mix | Iris mipmaps + per-level 3x3 tent in one pass | conceptual |
+| Volumetric light | Hillaire (SIGGRAPH 2015, cited in M3); Henyey-Greenstein phase | shadow-mapped single scattering in participating media | `volumetric.glsl` | algorithmic |
+| Split tone | common color-grading practice (public) | warm highlights / cool shadows | luminance-preserving, preset-scaled | conceptual |
